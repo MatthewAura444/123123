@@ -84,6 +84,245 @@
             display: block;
         }
 
+        .create-gift-btn {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .create-gift-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .gift-details {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--tg-theme-bg-color, #fff);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .gift-details.active {
+            display: block;
+        }
+
+        .gift-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .gift-details-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--tg-theme-text-color, #000);
+        }
+
+        .gift-details-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .gift-details-image {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .gift-details-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gift-details-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .gift-details-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .gift-details-price {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--tg-theme-button-color, #2481cc);
+        }
+
+        .gift-details-seller {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+        }
+
+        .seller-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: var(--tg-theme-button-color, #2481cc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .seller-info {
+            flex: 1;
+        }
+
+        .seller-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .seller-rating {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #999);
+        }
+
+        .gift-details-description {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .gift-details-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .buy-gift-btn {
+            flex: 1;
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .create-gift-form {
+            display: none;
+            padding: 20px;
+            background: var(--tg-theme-bg-color, #fff);
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .create-gift-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--tg-theme-hint-color, #999);
+            border-radius: 8px;
+            background: var(--tg-theme-bg-color, #fff);
+            color: var(--tg-theme-text-color, #000);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--tg-theme-hint-color, #999);
+            border-radius: 8px;
+            background: var(--tg-theme-bg-color, #fff);
+            color: var(--tg-theme-text-color, #000);
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-submit-btn {
+            flex: 1;
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .form-cancel-btn {
+            flex: 1;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .gift-card .seller-info {
+            padding: 8px 12px;
+            border-top: 1px solid var(--tg-theme-hint-color, rgba(0, 0, 0, 0.1));
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gift-card .seller-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .gift-card .seller-name {
+            font-size: 14px;
+            margin: 0;
+        }
+
         .categories {
             display: flex;
             overflow-x: auto;
@@ -404,6 +643,44 @@
         </div>
 
         <div class="tab-content active" id="gifts-tab">
+            <button class="create-gift-btn" id="createGiftBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 4v16m0-16l-4 4m4-4l4 4m-4 12l-4-4m4 4l4-4"/>
+                </svg>
+                Create New Gift
+            </button>
+
+            <div class="create-gift-form" id="createGiftForm">
+                <div class="form-group">
+                    <label class="form-label">Gift Name</label>
+                    <input type="text" class="form-input" id="giftName" placeholder="Enter gift name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Model</label>
+                    <input type="text" class="form-input" id="giftModel" placeholder="Enter model details">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Background</label>
+                    <input type="text" class="form-input" id="giftBackground" placeholder="Enter background details">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Pattern</label>
+                    <input type="text" class="form-input" id="giftPattern" placeholder="Enter pattern details">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Price (TON)</label>
+                    <input type="number" class="form-input" id="giftPrice" placeholder="Enter price in TON">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="giftDescription" placeholder="Enter gift description"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="form-submit-btn" id="submitGiftBtn">Create Gift</button>
+                    <button class="form-cancel-btn" id="cancelGiftBtn">Cancel</button>
+                </div>
+            </div>
+
             <div class="categories" id="categories">
                 <div class="category active">All Gifts</div>
                 <div class="category">Popular</div>
@@ -414,6 +691,33 @@
 
             <div class="gifts-grid" id="giftsGrid">
                 <!-- Gifts will be added via JavaScript -->
+            </div>
+        </div>
+
+        <div class="gift-details" id="giftDetails">
+            <div class="gift-details-header">
+                <h2>Gift Details</h2>
+                <button class="gift-details-close" id="closeGiftDetails">&times;</button>
+            </div>
+            <div class="gift-details-content">
+                <div class="gift-details-image">
+                    <img src="" alt="" id="giftDetailsImage">
+                </div>
+                <div class="gift-details-info">
+                    <div class="gift-details-title" id="giftDetailsTitle"></div>
+                    <div class="gift-details-price" id="giftDetailsPrice"></div>
+                    <div class="gift-details-seller">
+                        <div class="seller-avatar" id="sellerAvatar"></div>
+                        <div class="seller-info">
+                            <div class="seller-name" id="sellerName"></div>
+                            <div class="seller-rating" id="sellerRating"></div>
+                        </div>
+                    </div>
+                    <div class="gift-details-description" id="giftDetailsDescription"></div>
+                </div>
+                <div class="gift-details-actions">
+                    <button class="buy-gift-btn" id="buyGiftBtn">Buy Now</button>
+                </div>
             </div>
         </div>
 
@@ -659,6 +963,94 @@
             // Загрузка статистики пользователя
             loadUserStats();
 
+            // Обработчик создания подарка
+            document.getElementById('createGiftBtn').addEventListener('click', function() {
+                document.getElementById('createGiftForm').classList.add('active');
+            });
+
+            document.getElementById('cancelGiftBtn').addEventListener('click', function() {
+                document.getElementById('createGiftForm').classList.remove('active');
+            });
+
+            document.getElementById('submitGiftBtn').addEventListener('click', async function() {
+                const giftData = {
+                    name: document.getElementById('giftName').value,
+                    model: document.getElementById('giftModel').value,
+                    background: document.getElementById('giftBackground').value,
+                    pattern: document.getElementById('giftPattern').value,
+                    price: document.getElementById('giftPrice').value,
+                    description: document.getElementById('giftDescription').value,
+                    seller: {
+                        name: user.first_name + ' ' + (user.last_name || ''),
+                        username: user.username || '',
+                        rating: 5.0
+                    }
+                };
+
+                // Здесь можно добавить отправку данных на сервер
+                console.log('New gift:', giftData);
+                
+                // Закрываем форму
+                document.getElementById('createGiftForm').classList.remove('active');
+                
+                // Очищаем поля
+                document.getElementById('giftName').value = '';
+                document.getElementById('giftModel').value = '';
+                document.getElementById('giftBackground').value = '';
+                document.getElementById('giftPattern').value = '';
+                document.getElementById('giftPrice').value = '';
+                document.getElementById('giftDescription').value = '';
+            });
+
+            // Обработчик деталей подарка
+            document.getElementById('closeGiftDetails').addEventListener('click', function() {
+                document.getElementById('giftDetails').classList.remove('active');
+            });
+
+            document.getElementById('buyGiftBtn').addEventListener('click', async function() {
+                const giftId = this.dataset.giftId;
+                const giftPrice = this.dataset.giftPrice;
+                
+                try {
+                    // Проверяем подключение кошелька
+                    if (!connector.connected) {
+                        await connectWallet();
+                    }
+
+                    // Отправляем транзакцию
+                    await connector.sendTransaction({
+                        validUntil: Math.floor(Date.now() / 1000) + 60,
+                        messages: [
+                            {
+                                address: currentGift.seller.walletAddress,
+                                amount: Math.floor(parseFloat(giftPrice) * 1000000000)
+                            }
+                        ]
+                    });
+
+                    // Отправляем данные о покупке
+                    tg.sendData(JSON.stringify({
+                        action: "buy_gift",
+                        gift_id: giftId,
+                        gift_name: currentGift.name,
+                        gift_price: giftPrice,
+                        seller_id: currentGift.seller.id
+                    }));
+
+                    // Закрываем детали
+                    document.getElementById('giftDetails').classList.remove('active');
+                    
+                    // Обновляем баланс
+                    await updateBalance();
+                    
+                    // Показываем уведомление
+                    alert('Gift purchased successfully!');
+                } catch (error) {
+                    console.error('Error buying gift:', error);
+                    alert('Error purchasing gift. Please try again later.');
+                }
+            });
+
             // Список доступных подарков
             const gifts = [
                 { 
@@ -707,11 +1099,15 @@
                     <div class="gift-info">
                         <div class="gift-name">${gift.name}</div>
                         <div class="gift-price">${gift.price}</div>
+                        <div class="seller-info">
+                            <div class="seller-avatar">${gift.seller.name.charAt(0)}</div>
+                            <div class="seller-name">${gift.seller.name}</div>
+                        </div>
                     </div>
                 `;
                 
                 // Добавляем обработчик клика
-                giftElement.addEventListener('click', () => selectGift(gift));
+                giftElement.addEventListener('click', () => showGiftDetails(gift));
                 document.getElementById('giftsGrid').appendChild(giftElement);
             });
 
@@ -760,6 +1156,26 @@
             };
             tg.sendData(JSON.stringify(data));
             tg.close();
+        }
+
+        // Функция показа деталей подарка
+        function showGiftDetails(gift) {
+            currentGift = gift;
+            
+            document.getElementById('giftDetailsImage').src = gift.image;
+            document.getElementById('giftDetailsImage').alt = gift.name;
+            document.getElementById('giftDetailsTitle').textContent = gift.name;
+            document.getElementById('giftDetailsPrice').textContent = gift.price;
+            document.getElementById('sellerAvatar').textContent = gift.seller.name.charAt(0);
+            document.getElementById('sellerName').textContent = gift.seller.name;
+            document.getElementById('sellerRating').textContent = `Rating: ${gift.seller.rating}`;
+            document.getElementById('giftDetailsDescription').textContent = gift.description;
+            
+            const buyBtn = document.getElementById('buyGiftBtn');
+            buyBtn.dataset.giftId = gift.id;
+            buyBtn.dataset.giftPrice = gift.price;
+            
+            document.getElementById('giftDetails').classList.add('active');
         }
     </script>
 </body>

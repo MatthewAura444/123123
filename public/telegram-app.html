@@ -6,71 +6,174 @@
     <title>TelegramGift - Telegram Web App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        :root {
+            --tg-theme-button-color: #2481cc;
+            --tg-theme-button-text-color: #ffffff;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background-color: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
-        .container {
-            max-width: 800px;
+
+        .app-container {
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 16px;
         }
+
         .header {
+            padding: 20px 0;
             text-align: center;
-            margin-bottom: 30px;
+            position: relative;
+            margin-bottom: 24px;
         }
-        .content {
-            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--tg-theme-text-color, #000000);
+            margin: 0;
         }
-        .gift-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+
+        .categories {
+            display: flex;
+            overflow-x: auto;
+            padding: 8px 0;
+            margin-bottom: 24px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
-        .gift-item {
-            background: var(--tg-theme-bg-color, #ffffff);
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
+
+        .categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category {
+            flex: 0 0 auto;
+            padding: 8px 16px;
+            margin-right: 8px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--tg-theme-text-color, #000000);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
-        .gift-item:hover {
-            transform: translateY(-5px);
+
+        .category.active {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
         }
-        .gift-item img {
+
+        .gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 0 0 16px 0;
+        }
+
+        .gift-card {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .gift-card:active {
+            transform: scale(0.98);
+        }
+
+        .gift-image {
             width: 100%;
-            height: auto;
-            margin-bottom: 10px;
-            border-radius: 5px;
+            padding-top: 100%;
+            position: relative;
+            background: var(--tg-theme-bg-color, #ffffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
+        .gift-image img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        .gift-info {
+            padding: 12px;
+        }
+
         .gift-name {
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--tg-theme-text-color, #000000);
         }
+
         .gift-price {
+            font-size: 14px;
+            font-weight: 500;
             color: var(--tg-theme-hint-color, #999);
+        }
+
+        .gift-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        @media (min-width: 768px) {
+            .gifts-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .gifts-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <div class="header">
             <h1>TelegramGift</h1>
         </div>
-        <div class="content">
-            <h2>Выберите подарок</h2>
-            <p>Нажмите на подарок, чтобы отправить его другу</p>
-            <div class="gift-grid" id="giftGrid">
-                <!-- Подарки будут добавлены через JavaScript -->
-            </div>
+
+        <div class="categories" id="categories">
+            <div class="category active">Все подарки</div>
+            <div class="category">Популярные</div>
+            <div class="category">Новинки</div>
+            <div class="category">Акции</div>
+            <div class="category">Premium</div>
+        </div>
+
+        <div class="gifts-grid" id="giftsGrid">
+            <!-- Подарки будут добавлены через JavaScript -->
         </div>
     </div>
 
@@ -79,36 +182,95 @@
         
         // Список доступных подарков
         const gifts = [
-            { id: 1, name: "Роза", price: "100 ₽", image: "gifts/eternal-rose-1.svg" },
-            { id: 2, name: "Пепе", price: "200 ₽", image: "gifts/plush-pepe-1.svg" },
-            { id: 3, name: "Кристалл", price: "150 ₽", image: "categories/crystal-ball.svg" },
-            { id: 4, name: "Кепка", price: "300 ₽", image: "categories/durovs-cap.svg" }
+            { 
+                id: 1, 
+                name: "Вечная роза", 
+                price: "1000 ₽", 
+                image: "gifts/eternal-rose-1.svg",
+                category: "premium",
+                badge: "Premium"
+            },
+            { 
+                id: 2, 
+                name: "Пепе", 
+                price: "500 ₽", 
+                image: "gifts/plush-pepe-1.svg",
+                category: "popular",
+                badge: "Топ продаж"
+            },
+            { 
+                id: 3, 
+                name: "Магический кристалл", 
+                price: "750 ₽", 
+                image: "categories/crystal-ball.svg",
+                category: "new",
+                badge: "Новинка"
+            },
+            { 
+                id: 4, 
+                name: "Кепка Дурова", 
+                price: "1500 ₽", 
+                image: "categories/durovs-cap.svg",
+                category: "premium",
+                badge: "Эксклюзив"
+            }
         ];
 
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            const giftGrid = document.getElementById('giftGrid');
+            const giftsGrid = document.getElementById('giftsGrid');
+            const categories = document.getElementById('categories');
             
+            // Обработчик категорий
+            categories.addEventListener('click', function(e) {
+                if (e.target.classList.contains('category')) {
+                    // Убираем активный класс у всех категорий
+                    document.querySelectorAll('.category').forEach(cat => cat.classList.remove('active'));
+                    // Добавляем активный класс выбранной категории
+                    e.target.classList.add('active');
+                }
+            });
+
             // Создаем карточки подарков
             gifts.forEach(gift => {
                 const giftElement = document.createElement('div');
-                giftElement.className = 'gift-item';
+                giftElement.className = 'gift-card';
                 giftElement.innerHTML = `
-                    <img src="${gift.image}" alt="${gift.name}">
-                    <div class="gift-name">${gift.name}</div>
-                    <div class="gift-price">${gift.price}</div>
+                    <div class="gift-image">
+                        <img src="${gift.image}" alt="${gift.name}">
+                        ${gift.badge ? `<div class="gift-badge">${gift.badge}</div>` : ''}
+                    </div>
+                    <div class="gift-info">
+                        <div class="gift-name">${gift.name}</div>
+                        <div class="gift-price">${gift.price}</div>
+                    </div>
                 `;
                 
                 // Добавляем обработчик клика
                 giftElement.addEventListener('click', () => selectGift(gift));
-                giftGrid.appendChild(giftElement);
+                giftsGrid.appendChild(giftElement);
             });
 
-            // Расширяем окно на весь экран
+            // Настраиваем Telegram Web App
             tg.expand();
-
-            // Сообщаем, что приложение готово
             tg.ready();
+
+            // Устанавливаем основную кнопку
+            tg.MainButton.text = "Перейти к оформлению";
+            tg.MainButton.show();
+            tg.MainButton.disable();
+
+            // Счетчик выбранных подарков
+            let selectedGifts = 0;
+            
+            // Обновляем состояние кнопки
+            function updateMainButton() {
+                if (selectedGifts > 0) {
+                    tg.MainButton.enable();
+                } else {
+                    tg.MainButton.disable();
+                }
+            }
         });
 
         // Функция выбора подарка
@@ -117,7 +279,8 @@
                 action: "select_gift",
                 gift_id: gift.id,
                 gift_name: gift.name,
-                gift_price: gift.price
+                gift_price: gift.price,
+                gift_category: gift.category
             };
             tg.sendData(JSON.stringify(data));
             tg.close();

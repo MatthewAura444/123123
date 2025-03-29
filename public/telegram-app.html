@@ -28,19 +28,35 @@
             padding: 20px;
             margin-bottom: 20px;
         }
-        .button {
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            border-radius: 8px;
-            padding: 12px 24px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 10px;
+        .gift-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
-        .button:hover {
-            opacity: 0.9;
+        .gift-item {
+            background: var(--tg-theme-bg-color, #ffffff);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .gift-item:hover {
+            transform: translateY(-5px);
+        }
+        .gift-item img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .gift-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .gift-price {
+            color: var(--tg-theme-hint-color, #999);
         }
     </style>
 </head>
@@ -50,38 +66,42 @@
             <h1>TelegramGift</h1>
         </div>
         <div class="content">
-            <h2>Добро пожаловать!</h2>
-            <p>Это веб-приложение TelegramGift в Telegram.</p>
-            <button class="button" id="mainButton">Отправить данные</button>
+            <h2>Выберите подарок</h2>
+            <p>Нажмите на подарок, чтобы отправить его другу</p>
+            <div class="gift-grid" id="giftGrid">
+                <!-- Подарки будут добавлены через JavaScript -->
+            </div>
         </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
+        
+        // Список доступных подарков
+        const gifts = [
+            { id: 1, name: "Роза", price: "100 ₽", image: "gifts/eternal-rose-1.svg" },
+            { id: 2, name: "Пепе", price: "200 ₽", image: "gifts/plush-pepe-1.svg" },
+            { id: 3, name: "Кристалл", price: "150 ₽", image: "categories/crystal-ball.svg" },
+            { id: 4, name: "Кепка", price: "300 ₽", image: "categories/durovs-cap.svg" }
+        ];
 
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            // Активируем главную кнопку
-            tg.MainButton.text = "Отправить данные";
-            tg.MainButton.show();
-            tg.MainButton.enable();
-
-            // Обработчик нажатия на главную кнопку
-            tg.MainButton.onClick(function() {
-                const data = {
-                    message: "Hello from TelegramGift!",
-                    timestamp: new Date().toISOString()
-                };
-                tg.sendData(JSON.stringify(data));
-            });
-
-            // Обработчик нажатия на кнопку в интерфейсе
-            document.getElementById('mainButton').addEventListener('click', function() {
-                const data = {
-                    message: "Hello from TelegramGift!",
-                    timestamp: new Date().toISOString()
-                };
-                tg.sendData(JSON.stringify(data));
+            const giftGrid = document.getElementById('giftGrid');
+            
+            // Создаем карточки подарков
+            gifts.forEach(gift => {
+                const giftElement = document.createElement('div');
+                giftElement.className = 'gift-item';
+                giftElement.innerHTML = `
+                    <img src="${gift.image}" alt="${gift.name}">
+                    <div class="gift-name">${gift.name}</div>
+                    <div class="gift-price">${gift.price}</div>
+                `;
+                
+                // Добавляем обработчик клика
+                giftElement.addEventListener('click', () => selectGift(gift));
+                giftGrid.appendChild(giftElement);
             });
 
             // Расширяем окно на весь экран
@@ -90,6 +110,18 @@
             // Сообщаем, что приложение готово
             tg.ready();
         });
+
+        // Функция выбора подарка
+        function selectGift(gift) {
+            const data = {
+                action: "select_gift",
+                gift_id: gift.id,
+                gift_name: gift.name,
+                gift_price: gift.price
+            };
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        }
     </script>
 </body>
 </html> 

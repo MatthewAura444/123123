@@ -1663,7 +1663,36 @@ app.get('/api/telegram/stats', (req, res) => {
     res.json(stats);
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Сервер запущен на порту ${port}`);
+// API эндпоинты
+app.get('/api/trade-market-stats', (req, res) => {
+    // Тестовые данные
+    res.json({
+        sellers: 150,
+        gifts: 320
+    });
+});
+
+app.get('/api/trade-market-gifts', (req, res) => {
+    // Тестовые данные
+    res.json([
+        {
+            id: 1,
+            name: "Premium Gift",
+            price: "25.0",
+            seller: "@premium_seller",
+            image: "https://ton.org/gift-premium.png"
+        },
+        {
+            id: 2,
+            name: "Special Gift",
+            price: "15.5",
+            seller: "@gift_master",
+            image: "https://ton.org/gift-special.png"
+        }
+    ]);
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Сервер запущен на порту ${PORT}`);
 }); 

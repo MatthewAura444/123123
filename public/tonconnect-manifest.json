@@ -1,14 +1,22 @@
 {
     "url": "https://matthewaura444.github.io/123123/public/telegram-app.html",
     "name": "TelegramGift",
-    "iconUrl": "https://matthewaura444.github.io/123123/public/favicon.ico",
+    "iconUrl": "https://ton.org/telegram-wallet.svg",
     "termsOfUseUrl": "https://matthewaura444.github.io/123123/terms.html",
     "privacyPolicyUrl": "https://matthewaura444.github.io/123123/privacy.html",
     "items": [
         {
             "name": "ton_addr",
-            "required": true,
-            "multiple": false
+            "description": "Получить адрес кошелька"
+        },
+        {
+            "name": "ton_proof",
+            "description": "Подтвердить владение кошельком"
         }
-    ]
+    ],
+    "platforms": ["ios", "android", "web"],
+    "app_id": "123123",
+    "bridge": {
+        "url": "https://bridge.tonapi.io/bridge"
+    }
 } 

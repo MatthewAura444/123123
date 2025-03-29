@@ -399,21 +399,21 @@
         </div>
 
         <div class="nav-tabs">
-            <div class="nav-tab active" data-tab="gifts">Подарки</div>
-            <div class="nav-tab" data-tab="profile">Мой профиль</div>
+            <div class="nav-tab active" data-tab="gifts">Gifts</div>
+            <div class="nav-tab" data-tab="profile">My Profile</div>
         </div>
 
         <div class="tab-content active" id="gifts-tab">
             <div class="categories" id="categories">
-                <div class="category active">Все подарки</div>
-                <div class="category">Популярные</div>
-                <div class="category">Новинки</div>
-                <div class="category">Акции</div>
+                <div class="category active">All Gifts</div>
+                <div class="category">Popular</div>
+                <div class="category">New</div>
+                <div class="category">Special Offers</div>
                 <div class="category">Premium</div>
             </div>
 
             <div class="gifts-grid" id="giftsGrid">
-                <!-- Подарки будут добавлены через JavaScript -->
+                <!-- Gifts will be added via JavaScript -->
             </div>
         </div>
 
@@ -422,46 +422,46 @@
                 <div class="profile-header">
                     <div class="profile-avatar" id="profileAvatar">T</div>
                     <div class="profile-info">
-                        <h2 id="profileName">Загрузка...</h2>
+                        <h2 id="profileName">Loading...</h2>
                         <p id="profileUsername">@username</p>
                     </div>
                 </div>
 
                 <div id="walletSection">
-                    <h3>TON Кошелек</h3>
+                    <h3>TON Wallet</h3>
                     <div id="walletNotConnected">
-                        <p>Подключите кошелек TON для отправки и получения подарков</p>
-                        <button class="connect-wallet-btn" id="connectWalletBtn">Подключить кошелек</button>
+                        <p>Connect your TON wallet to send and receive gifts</p>
+                        <button class="connect-wallet-btn" id="connectWalletBtn">Connect Wallet</button>
                     </div>
                     <div id="walletConnected" style="display: none;">
                         <div class="wallet-section">
                             <div class="wallet-header">
-                                <span>Баланс:</span>
+                                <span>Balance:</span>
                                 <span class="wallet-balance" id="walletBalance">0 TON</span>
                             </div>
                             <div class="wallet-address" id="walletAddress">
-                                Загрузка адреса...
+                                Loading address...
                             </div>
                             <div class="wallet-actions">
                                 <button class="wallet-action-btn" id="sendTonBtn">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M12 4v16m0-16l-4 4m4-4l4 4m-4 12l-4-4m4 4l4-4"/>
                                     </svg>
-                                    Отправить
+                                    Send
                                 </button>
                                 <button class="wallet-action-btn secondary" id="receiveTonBtn">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M12 20V4m0 16l4-4m-4 4l-4-4m4-16l-4 4m4-4l4 4"/>
                                     </svg>
-                                    Получить
+                                    Receive
                                 </button>
                             </div>
                         </div>
 
                         <div class="transaction-history">
-                            <h3>История транзакций</h3>
+                            <h3>Transaction History</h3>
                             <div class="transaction-list" id="transactionList">
-                                <!-- Транзакции будут добавлены через JavaScript -->
+                                <!-- Transactions will be added via JavaScript -->
                             </div>
                         </div>
                     </div>
@@ -470,11 +470,11 @@
                 <div class="profile-stats">
                     <div class="stat-card">
                         <div class="stat-value" id="giftsSent">0</div>
-                        <div class="stat-label">Отправлено подарков</div>
+                        <div class="stat-label">Gifts Sent</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="giftsReceived">0</div>
-                        <div class="stat-label">Получено подарков</div>
+                        <div class="stat-label">Gifts Received</div>
                     </div>
                 </div>
             </div>
@@ -561,12 +561,12 @@
                     const transactionElement = document.createElement('div');
                     transactionElement.className = 'transaction-item';
                     
-                    const amount = transaction.amount / 1000000000; // Конвертируем из нановатов в TON
+                    const amount = transaction.amount / 1000000000; // Convert from nanograms to TON
                     const isPositive = transaction.type === 'receive';
                     
                     transactionElement.innerHTML = `
                         <div class="transaction-info">
-                            <div class="transaction-type">${transaction.type === 'send' ? 'Отправка' : 'Получение'}</div>
+                            <div class="transaction-type">${transaction.type === 'send' ? 'Sent' : 'Received'}</div>
                             <div class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</div>
                         </div>
                         <div class="transaction-amount ${isPositive ? 'positive' : 'negative'}">
@@ -577,18 +577,18 @@
                     transactionList.appendChild(transactionElement);
                 });
             } catch (error) {
-                console.error('Ошибка загрузки истории транзакций:', error);
+                console.error('Error loading transaction history:', error);
             }
         }
 
         // Отправка TON
         async function sendTon() {
             try {
-                const amount = prompt('Введите количество TON для отправки:');
+                const amount = prompt('Enter amount of TON to send:');
                 if (!amount) return;
 
                 const amountInNano = Math.floor(parseFloat(amount) * 1000000000);
-                const recipientAddress = prompt('Введите адрес получателя:');
+                const recipientAddress = prompt('Enter recipient address:');
                 if (!recipientAddress) return;
 
                 await connector.sendTransaction({
@@ -604,8 +604,8 @@
                 await updateBalance();
                 await loadTransactionHistory();
             } catch (error) {
-                console.error('Ошибка отправки TON:', error);
-                alert('Ошибка при отправке TON. Попробуйте позже.');
+                console.error('Error sending TON:', error);
+                alert('Error sending TON. Please try again later.');
             }
         }
 
@@ -615,12 +615,11 @@
                 const walletAddress = await connector.getWalletConnectionSource();
                 if (walletAddress) {
                     const qrCode = await connector.getQRCode();
-                    // Здесь можно добавить отображение QR-кода
-                    alert(`Ваш адрес для получения TON: ${walletAddress.account.address}`);
+                    alert(`Your TON receiving address: ${walletAddress.account.address}`);
                 }
             } catch (error) {
-                console.error('Ошибка получения QR-кода:', error);
-                alert('Ошибка при получении адреса. Попробуйте позже.');
+                console.error('Error getting QR code:', error);
+                alert('Error getting address. Please try again later.');
             }
         }
 
@@ -664,35 +663,35 @@
             const gifts = [
                 { 
                     id: 1, 
-                    name: "Вечная роза", 
-                    price: "1000 ₽", 
+                    name: "Eternal Rose", 
+                    price: "$10", 
                     image: "gifts/eternal-rose-1.svg",
                     category: "premium",
                     badge: "Premium"
                 },
                 { 
                     id: 2, 
-                    name: "Пепе", 
-                    price: "500 ₽", 
+                    name: "Pepe Plush", 
+                    price: "$5", 
                     image: "gifts/plush-pepe-1.svg",
                     category: "popular",
-                    badge: "Топ продаж"
+                    badge: "Top Sales"
                 },
                 { 
                     id: 3, 
-                    name: "Магический кристалл", 
-                    price: "750 ₽", 
+                    name: "Magic Crystal", 
+                    price: "$7.50", 
                     image: "categories/crystal-ball.svg",
                     category: "new",
-                    badge: "Новинка"
+                    badge: "New"
                 },
                 { 
                     id: 4, 
-                    name: "Кепка Дурова", 
-                    price: "1500 ₽", 
+                    name: "Durov's Cap", 
+                    price: "$15", 
                     image: "categories/durovs-cap.svg",
                     category: "premium",
-                    badge: "Эксклюзив"
+                    badge: "Exclusive"
                 }
             ];
 
@@ -721,7 +720,7 @@
             tg.ready();
 
             // Устанавливаем основную кнопку
-            tg.MainButton.text = "Перейти к оформлению";
+            tg.MainButton.text = "Proceed to Checkout";
             tg.MainButton.show();
             tg.MainButton.disable();
 

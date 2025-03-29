@@ -17,7 +17,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик команды /start"""
     try:
         keyboard = [
-            [InlineKeyboardButton("Открыть Fazer", web_app=WebAppInfo(url="https://matthewaura444.github.io/123123/telegram-app.html"))]
+            [InlineKeyboardButton("Открыть Fazer", web_app=WebAppInfo(url="https://matthewaura444.github.io/123123/public/telegram-app.html"))]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text(
@@ -34,7 +34,7 @@ async def webapp(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик команды /webapp"""
     try:
         keyboard = [
-            [InlineKeyboardButton("Открыть Fazer", web_app=WebAppInfo(url="https://matthewaura444.github.io/123123/telegram-app.html"))]
+            [InlineKeyboardButton("Открыть Fazer", web_app=WebAppInfo(url="https://matthewaura444.github.io/123123/public/telegram-app.html"))]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text(

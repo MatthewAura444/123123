@@ -1,9 +1,9 @@
 {
-    "url": "http://localhost:3000",
-    "name": "Telegram Gifts",
-    "iconUrl": "http://localhost:3000/icon.png",
-    "termsOfUseUrl": "http://localhost:3000/terms",
-    "privacyPolicyUrl": "http://localhost:3000/privacy",
+    "url": "https://matthewaura444.github.io/123123/public/telegram-app.html",
+    "name": "TelegramGift",
+    "iconUrl": "https://matthewaura444.github.io/123123/public/favicon.ico",
+    "termsOfUseUrl": "https://matthewaura444.github.io/123123/terms.html",
+    "privacyPolicyUrl": "https://matthewaura444.github.io/123123/privacy.html",
     "items": [
         {
             "name": "ton_addr",

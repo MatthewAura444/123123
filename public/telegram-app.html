@@ -1095,6 +1095,42 @@
             font-size: 14px;
             color: #0088cc;
         }
+
+        .profile-section {
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 3px solid var(--tg-theme-button-color, #0088cc);
+            transition: all 0.3s ease;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color, #000000);
+            margin: 8px 0;
+            background: linear-gradient(45deg, var(--tg-theme-button-color, #0088cc), var(--tg-theme-secondary-bg-color, #a0a0a0));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Добавляем эффект при наведении на аватар */
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            border-color: var(--tg-theme-button-text-color, #ffffff);
+            box-shadow: 0 0 20px rgba(0, 136, 204, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -1272,6 +1308,43 @@
         let tg = window.Telegram.WebApp;
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Инициализация Telegram Web App
+            window.Telegram.WebApp.ready();
+            
+            // Получаем данные пользователя
+            const user = window.Telegram.WebApp.initDataUnsafe.user;
+            if (user) {
+                // Обновляем имя пользователя
+                const profileName = document.querySelector('.profile-name');
+                if (profileName) {
+                    profileName.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                }
+
+                // Обновляем аватар пользователя
+                const profileAvatar = document.querySelector('.profile-avatar');
+                if (profileAvatar) {
+                    if (user.photo_url) {
+                        profileAvatar.style.backgroundImage = `url(${user.photo_url})`;
+                    } else {
+                        // Если аватарка отсутствует, показываем первую букву имени
+                        profileAvatar.textContent = user.first_name.charAt(0).toUpperCase();
+                        profileAvatar.style.backgroundColor = '#0088cc';
+                        profileAvatar.style.color = 'white';
+                        profileAvatar.style.display = 'flex';
+                        profileAvatar.style.alignItems = 'center';
+                        profileAvatar.style.justifyContent = 'center';
+                        profileAvatar.style.fontSize = '24px';
+                    }
+                }
+            }
+
+            // Обновляем цветовую схему
+            const colorScheme = window.Telegram.WebApp.colorScheme;
+            document.documentElement.setAttribute('data-theme', colorScheme);
+
+            // Показываем основной контент
+            document.body.style.visibility = 'visible';
+
             // Функция для обновления статистики Trade Market
             function updateTradeMarketStats() {
                 // Здесь будет запрос к серверу для получения реальных данных
@@ -1377,35 +1450,6 @@
             // Настраиваем Telegram Web App
             tg.expand();
             tg.ready();
-
-            // Функция для установки данных профиля
-            function setProfileData() {
-                const profileName = document.querySelector('.profile-name');
-                const avatarPlaceholder = document.querySelector('.profile-avatar-placeholder');
-                
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    const user = tg.initDataUnsafe.user;
-                    
-                    // Устанавливаем имя пользователя
-                    profileName.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-                    
-                    // Если есть фото профиля
-                    if (user.photo_url) {
-                        const img = document.createElement('img');
-                        img.src = user.photo_url;
-                        img.alt = 'Profile Photo';
-                        avatarPlaceholder.parentNode.replaceChild(img, avatarPlaceholder);
-                    } else {
-                        // Если фото нет, показываем первую букву имени
-                        avatarPlaceholder.textContent = user.first_name.charAt(0).toUpperCase();
-                    }
-                }
-            }
-
-            // Вызываем функцию после инициализации Telegram Web App
-            tg.ready(() => {
-                setProfileData();
-            });
 
             function showWalletConnect() {
                 document.getElementById('walletConnectModal').classList.add('active');

@@ -757,6 +757,85 @@
             background: var(--tg-theme-secondary-bg-color, #f0f0f0);
             color: var(--tg-theme-text-color, #000);
         }
+
+        .my-gifts-section {
+            margin: 24px 0;
+            background: var(--tg-theme-bg-color, #fff);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .my-gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .my-gift-card {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .my-gift-image {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .my-gift-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .my-gift-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .my-gift-name {
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .my-gift-price {
+            color: var(--tg-theme-button-color, #2481cc);
+            font-weight: 500;
+        }
+
+        .delete-gift-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 59, 48, 0.9);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .delete-gift-btn:hover {
+            background: rgba(255, 59, 48, 1);
+        }
+
+        @media (min-width: 768px) {
+            .my-gifts-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
@@ -856,6 +935,13 @@
                     <div class="profile-info">
                         <h2 id="profileName">Loading...</h2>
                         <p id="profileUsername">@username</p>
+                    </div>
+                </div>
+
+                <div class="my-gifts-section">
+                    <h3>My Gifts for Sale</h3>
+                    <div class="my-gifts-grid" id="myGiftsGrid">
+                        <!-- My gifts will be added here -->
                     </div>
                 </div>
 
@@ -1293,6 +1379,8 @@
                     document.getElementById('totalPurchases').textContent = `${data.total_purchases_amount} TON`;
                     document.getElementById('userRating').textContent = data.rating;
                     document.getElementById('totalReviews').textContent = data.total_reviews;
+                } else if (data.action === 'my_gifts') {
+                    displayMyGifts(data.gifts);
                 }
             } catch (error) {
                 console.error('Ошибка обработки сообщения:', error);
@@ -1342,6 +1430,71 @@
             buyBtn.dataset.giftPrice = gift.price;
             
             document.getElementById('giftDetails').classList.add('active');
+        }
+
+        // Функция для отображения подарков пользователя
+        function displayMyGifts(gifts) {
+            const myGiftsGrid = document.getElementById('myGiftsGrid');
+            myGiftsGrid.innerHTML = '';
+
+            gifts.forEach(gift => {
+                const giftElement = document.createElement('div');
+                giftElement.className = 'my-gift-card';
+                giftElement.innerHTML = `
+                    <button class="delete-gift-btn" data-gift-id="${gift.id}">&times;</button>
+                    <div class="my-gift-image">
+                        <img src="${gift.image}" alt="${gift.name}">
+                    </div>
+                    <div class="my-gift-info">
+                        <div class="my-gift-name">${gift.name}</div>
+                        <div class="my-gift-price">${gift.price} TON</div>
+                    </div>
+                `;
+
+                // Добавляем обработчик удаления
+                const deleteBtn = giftElement.querySelector('.delete-gift-btn');
+                deleteBtn.addEventListener('click', () => deleteGift(gift.id));
+
+                myGiftsGrid.appendChild(giftElement);
+            });
+        }
+
+        // Функция удаления подарка
+        async function deleteGift(giftId) {
+            if (!confirm('Are you sure you want to delete this gift?')) {
+                return;
+            }
+
+            try {
+                // Отправляем запрос на удаление
+                tg.sendData(JSON.stringify({
+                    action: "delete_gift",
+                    gift_id: giftId
+                }));
+
+                // Обновляем статистику
+                loadUserStats();
+            } catch (error) {
+                console.error('Ошибка удаления подарка:', error);
+                alert('Error deleting gift. Please try again later.');
+            }
+        }
+
+        // Загрузка подарков пользователя
+        async function loadMyGifts() {
+            try {
+                tg.sendData(JSON.stringify({
+                    action: "get_my_gifts"
+                }));
+            } catch (error) {
+                console.error('Ошибка загрузки подарков:', error);
+            }
+        }
+
+        // Обновляем функцию загрузки профиля
+        async function loadProfile() {
+            loadUserStats();
+            loadMyGifts();
         }
     </script>
 </body>

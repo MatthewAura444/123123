@@ -59,6 +59,33 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         user = update.effective_user
         user_id = user.id
 
+        if data.get('action') == 'delete_gift':
+            # Обработка удаления подарка
+            gift_id = data.get('gift_id')
+            gift = gifts.get(gift_id)
+            
+            if not gift:
+                await update.message.reply_text("❌ Error: Gift not found.")
+                return
+
+            if gift['seller']['id'] != user_id:
+                await update.message.reply_text("❌ Error: You can only delete your own gifts.")
+                return
+
+            # Удаляем подарок из всех списков
+            if gift_id in gifts:
+                del gifts[gift_id]
+            if user_id in user_gifts and gift_id in user_gifts[user_id]:
+                user_gifts[user_id].remove(gift_id)
+            
+            # Обновляем статистику
+            user_stats[user_id]['gifts_for_sale'] -= 1
+
+            await update.message.reply_text(
+                f"✅ Gift '{gift['name']}' has been successfully deleted from your profile."
+            )
+            return
+
         if data.get('action') == 'get_stats':
             # Получаем статистику пользователя
             user_gift_ids = user_gifts.get(user_id, [])
@@ -274,8 +301,12 @@ async def my_gifts(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             f"Name: {gift['name']}\n"
             f"Price: {gift['price']} TON\n"
             f"Model: {gift['model']}\n"
-            f"Status: Available\n\n"
+            f"Status: Available\n"
+            f"ID: {gift['id']}\n\n"
         )
+
+    message += "\nTo delete a gift, use the command:\n"
+    message += "/delete_gift <gift_id>"
 
     await update.message.reply_text(message)
 
@@ -325,6 +356,38 @@ async def my_profile(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
     await update.message.reply_text(message)
 
+async def delete_gift(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Delete a gift by ID."""
+    try:
+        gift_id = int(context.args[0])
+        user_id = update.effective_user.id
+        gift = gifts.get(gift_id)
+        
+        if not gift:
+            await update.message.reply_text("❌ Error: Gift not found.")
+            return
+
+        if gift['seller']['id'] != user_id:
+            await update.message.reply_text("❌ Error: You can only delete your own gifts.")
+            return
+
+        # Удаляем подарок из всех списков
+        del gifts[gift_id]
+        if user_id in user_gifts and gift_id in user_gifts[user_id]:
+            user_gifts[user_id].remove(gift_id)
+        
+        # Обновляем статистику
+        user_stats[user_id]['gifts_for_sale'] -= 1
+
+        await update.message.reply_text(
+            f"✅ Gift '{gift['name']}' has been successfully deleted from your profile."
+        )
+    except (IndexError, ValueError):
+        await update.message.reply_text(
+            "❌ Error: Please provide a valid gift ID.\n"
+            "Usage: /delete_gift <gift_id>"
+        )
+
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token
@@ -335,6 +398,7 @@ def main() -> None:
     application.add_handler(CommandHandler("my_gifts", my_gifts))
     application.add_handler(CommandHandler("gift_count", gift_count))
     application.add_handler(CommandHandler("my_profile", my_profile))
+    application.add_handler(CommandHandler("delete_gift", delete_gift))
     application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web_app_data))
 
     # Start the Bot

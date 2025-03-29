@@ -780,6 +780,10 @@
                         <div class="stat-value" id="giftsReceived">0</div>
                         <div class="stat-label">Gifts Received</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalGifts">0</div>
+                        <div class="stat-label">Total Gifts</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1133,13 +1137,27 @@
             }
         });
 
+        // Обработчик сообщений от бота
+        tg.onEvent('message', function(message) {
+            try {
+                const data = JSON.parse(message);
+                if (data.action === 'stats_update') {
+                    document.getElementById('totalGifts').textContent = data.total_gifts;
+                    document.getElementById('giftsSent').textContent = data.gifts_sent;
+                    document.getElementById('giftsReceived').textContent = data.gifts_received;
+                }
+            } catch (error) {
+                console.error('Ошибка обработки сообщения:', error);
+            }
+        });
+
         // Загрузка статистики пользователя
         async function loadUserStats() {
             try {
-                // Здесь можно добавить запрос к API для получения статистики
-                // Пока используем тестовые данные
-                document.getElementById('giftsSent').textContent = '12';
-                document.getElementById('giftsReceived').textContent = '8';
+                // Отправляем запрос на получение статистики
+                tg.sendData(JSON.stringify({
+                    action: "get_stats"
+                }));
             } catch (error) {
                 console.error('Ошибка загрузки статистики:', error);
             }

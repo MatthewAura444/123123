@@ -1,0 +1,14 @@
+{
+    "url": "http://localhost:3000",
+    "name": "Telegram Gifts",
+    "iconUrl": "http://localhost:3000/icon.png",
+    "termsOfUseUrl": "http://localhost:3000/terms",
+    "privacyPolicyUrl": "http://localhost:3000/privacy",
+    "items": [
+        {
+            "name": "ton_addr",
+            "required": true,
+            "multiple": false
+        }
+    ]
+} 

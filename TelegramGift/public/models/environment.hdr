@@ -1,0 +1,5 @@
+# RGBE HDR environment map
+# Created with model-viewer-converter
+VERSION=1.0
+FORMAT=32-bit_rle_rgbe
+EXPOSURE=1.0 

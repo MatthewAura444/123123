@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Gifts - Подарки для Telegram</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- TonConnect -->
+    <script src="https://ton.org/ton-connect"></script>
+</head>
+<body>
+    <header>
+        <h1>Telegram Gifts</h1>
+        <div class="header-buttons">
+            <button id="create-gift-button" class="create-button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Создать подарок
+            </button>
+            <div class="wallet-connect">
+                <button id="connect-wallet" class="connect-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v5"/>
+                        <path d="M3 12v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/>
+                    </svg>
+                    Подключить кошелек
+                </button>
+                <div id="wallet-info" class="wallet-info" style="display: none;">
+                    <span id="wallet-status">Кошелек подключен</span>
+                    <span id="connected-address"></span>
+                    <button id="disconnect-wallet" class="disconnect-button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Отключить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="filters-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Поиск подарков...">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="priceFilter">Цена:</label>
+                    <select id="priceFilter">
+                        <option value="all">Все цены</option>
+                        <option value="0-1">До 1 TON</option>
+                        <option value="1-5">1-5 TON</option>
+                        <option value="5-10">5-10 TON</option>
+                        <option value="10+">Более 10 TON</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Сортировка:</label>
+                    <select id="sort-filter">
+                        <option value="newest">Сначала новые</option>
+                        <option value="price-asc">По цене (возр.)</option>
+                        <option value="price-desc">По цене (убыв.)</option>
+                        <option value="popular">По популярности</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Статус:</label>
+                    <select id="status-filter">
+                        <option value="all">Все статусы</option>
+                        <option value="available">Доступные</option>
+                        <option value="sold">Проданы</option>
+                        <option value="pending">В процессе</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="gifts-grid" id="gifts-grid">
+            <!-- Здесь будут отображаться подарки -->
+        </div>
+    </main>
+
+    <!-- Модальное окно создания подарка -->
+    <div id="create-gift-modal" class="modal">
+        <div class="modal-content">
+            <h2>Создать новый подарок</h2>
+            <form id="create-gift-form">
+                <div class="form-group">
+                    <label for="gift-name">Название подарка</label>
+                    <input type="text" id="gift-name" required placeholder="Введите название подарка">
+                </div>
+                <div class="form-group">
+                    <label for="gift-description">Описание</label>
+                    <textarea id="gift-description" required placeholder="Опишите ваш подарок"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="gift-background">Фоновое изображение</label>
+                    <div class="file-upload">
+                        <input type="file" id="gift-background" accept="image/*" required>
+                        <label for="gift-background">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                            </svg>
+                            Выберите изображение
+                            <div class="file-name"></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="gift-model">3D модель (.glb или .gltf)</label>
+                    <div class="file-upload">
+                        <input type="file" id="gift-model" accept=".glb,.gltf" required>
+                        <label for="gift-model">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            Выберите 3D модель
+                            <div class="file-name"></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="gift-pattern">Задний узор</label>
+                    <div class="file-upload">
+                        <input type="file" id="gift-pattern" accept="image/*" required>
+                        <label for="gift-pattern">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16M4 8h16M4 12h16M4 16h16M4 20h16"/>
+                            </svg>
+                            Выберите узор
+                            <div class="file-name"></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="gift-price">Цена (TON)</label>
+                    <input type="number" id="gift-price" min="0.1" step="0.1" required placeholder="0.1">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                            <polyline points="17 21 17 13 7 13 7 21"/>
+                            <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        Создать подарок
+                    </button>
+                    <button type="button" class="cancel-button" onclick="closeModal('create-gift-modal')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                        Отмена
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно просмотра подарка -->
+    <div id="view-gift-modal" class="modal">
+        <div class="modal-content">
+            <h2>Просмотр подарка</h2>
+            <div id="gift-preview" class="gift-preview"></div>
+            <div class="gift-details">
+                <h3 id="gift-title"></h3>
+                <p id="gift-description"></p>
+                <p class="gift-price">Цена: <span id="gift-price"></span> TON</p>
+                <button id="buy-gift" class="buy-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Купить подарок
+                </button>
+            </div>
+            <button class="close-button" onclick="closeModal('view-gift-modal')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Подключаем скрипты -->
+    <script src="gifts.js"></script>
+</body>
+</html> 

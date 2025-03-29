@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>TelegramGift</title>
+    <!-- Import model-viewer component -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer@3.4.0/dist/model-viewer.min.js"></script>
+    <script nomodule src="https://unpkg.com/@google/model-viewer@3.4.0/dist/model-viewer-legacy.js"></script>
+    <style>
+        model-viewer {
+            width: 100%;
+            height: 400px;
+            background-color: #222222;
+            border-radius: 8px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <model-viewer
+        src="/models/durov-cap.glb"
+        alt="3D модель кепки"
+        auto-rotate
+        camera-controls
+        shadow-intensity="1"
+        exposure="1"
+        shadow-softness="0.5"
+        environment-image="neutral"
+        skybox-image="neutral">
+    </model-viewer>
+</body>
+</html> 

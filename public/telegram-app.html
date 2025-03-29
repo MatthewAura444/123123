@@ -1303,9 +1303,57 @@
     </div>
 
     <script>
+        // Инициализация Telegram Web App
+        let tg = window.Telegram.WebApp;
+        
+        // Функция для установки активного таба
+        function setActiveTab(tabId) {
+            // Убираем активный класс у всех табов
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Скрываем все контенты табов
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Активируем выбранный таб
+            const selectedTab = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
+            const selectedContent = document.getElementById(`${tabId}-tab`);
+            
+            if (selectedTab && selectedContent) {
+                selectedTab.classList.add('active');
+                selectedContent.style.display = 'block';
+            }
+        }
+
+        // Функция для подключения кошелька
+        function connectWallet(type) {
+            console.log('Connecting wallet:', type);
+            // Здесь будет логика подключения кошелька
+        }
+
+        // Функция для скрытия модального окна подключения кошелька
+        function hideWalletConnect() {
+            document.getElementById('walletConnectModal').classList.remove('active');
+        }
+
+        // Функция для скрытия модального окна со всеми кошельками
+        function hideAllWallets() {
+            document.getElementById('allWalletsModal').classList.remove('active');
+        }
+
+        // Функция для копирования в буфер обмена
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Link copied to clipboard!');
+            });
+        }
+
+        // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             // Инициализация Telegram Web App
-            const tg = window.Telegram.WebApp;
             tg.ready();
             
             // Получаем данные пользователя
@@ -1323,21 +1371,15 @@
                 // Обновляем аватар пользователя
                 const profileAvatar = document.querySelector('.profile-avatar');
                 if (profileAvatar) {
-                    // Создаем элемент img для аватарки
-                    const avatarImg = document.createElement('img');
-                    avatarImg.style.width = '100%';
-                    avatarImg.style.height = '100%';
-                    avatarImg.style.objectFit = 'cover';
-                    
                     if (user.photo_url) {
                         // Устанавливаем фото профиля
-                        avatarImg.src = user.photo_url;
-                        avatarImg.alt = 'User avatar';
-                        profileAvatar.innerHTML = ''; // Очищаем содержимое
-                        profileAvatar.appendChild(avatarImg);
+                        profileAvatar.style.backgroundImage = `url(${user.photo_url})`;
+                        profileAvatar.style.backgroundSize = 'cover';
+                        profileAvatar.style.backgroundPosition = 'center';
+                        profileAvatar.textContent = ''; // Очищаем содержимое
                     } else {
                         // Если фото нет, показываем первую букву имени
-                        profileAvatar.innerHTML = user.first_name.charAt(0).toUpperCase();
+                        profileAvatar.textContent = user.first_name.charAt(0).toUpperCase();
                         profileAvatar.style.backgroundColor = '#0088cc';
                         profileAvatar.style.color = 'white';
                         profileAvatar.style.display = 'flex';
@@ -1356,28 +1398,6 @@
 
             // Показываем основной контент
             document.body.style.visibility = 'visible';
-
-            // Функция для установки активного таба
-            function setActiveTab(tabId) {
-                // Убираем активный класс у всех табов
-                document.querySelectorAll('.nav-tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                
-                // Скрываем все контенты табов
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.style.display = 'none';
-                });
-                
-                // Активируем выбранный таб
-                const selectedTab = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
-                const selectedContent = document.getElementById(`${tabId}-tab`);
-                
-                if (selectedTab && selectedContent) {
-                    selectedTab.classList.add('active');
-                    selectedContent.style.display = 'block';
-                }
-            }
 
             // Добавляем обработчики для табов
             document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -1417,9 +1437,7 @@
             const copyBtn = document.querySelector('.copy-btn');
             if (copyBtn) {
                 copyBtn.addEventListener('click', function() {
-                    navigator.clipboard.writeText('ton://connect').then(() => {
-                        alert('Link copied to clipboard!');
-                    });
+                    copyToClipboard('ton://connect');
                 });
             }
 
@@ -1427,7 +1445,6 @@
             const tradeMarketCard = document.getElementById('trade-market-card');
             if (tradeMarketCard) {
                 tradeMarketCard.addEventListener('click', function() {
-                    // Здесь будет логика для открытия Trade Market
                     console.log('Trade Market clicked');
                 });
             }
@@ -1436,7 +1453,6 @@
             const createCollectionBtn = document.querySelector('.action-card');
             if (createCollectionBtn) {
                 createCollectionBtn.addEventListener('click', function() {
-                    // Здесь будет логика для создания коллекции
                     console.log('Create Collection clicked');
                 });
             }
@@ -1444,29 +1460,6 @@
             // Устанавливаем начальный активный таб
             setActiveTab('nft');
         });
-
-        // Функция для подключения кошелька
-        function connectWallet(type) {
-            console.log('Connecting wallet:', type);
-            // Здесь будет логика подключения кошелька
-        }
-
-        // Функция для скрытия модального окна подключения кошелька
-        function hideWalletConnect() {
-            document.getElementById('walletConnectModal').classList.remove('active');
-        }
-
-        // Функция для скрытия модального окна со всеми кошельками
-        function hideAllWallets() {
-            document.getElementById('allWalletsModal').classList.remove('active');
-        }
-
-        // Функция для копирования в буфер обмена
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Link copied to clipboard!');
-            });
-        }
     </script>
 </body>
 </html> 

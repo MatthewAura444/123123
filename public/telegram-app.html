@@ -1356,7 +1356,117 @@
 
             // Показываем основной контент
             document.body.style.visibility = 'visible';
+
+            // Функция для установки активного таба
+            function setActiveTab(tabId) {
+                // Убираем активный класс у всех табов
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Скрываем все контенты табов
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                // Активируем выбранный таб
+                const selectedTab = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
+                const selectedContent = document.getElementById(`${tabId}-tab`);
+                
+                if (selectedTab && selectedContent) {
+                    selectedTab.classList.add('active');
+                    selectedContent.style.display = 'block';
+                }
+            }
+
+            // Добавляем обработчики для табов
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    setActiveTab(tabId);
+                });
+            });
+
+            // Обработчик для кнопки подключения кошелька
+            const connectWalletBtn = document.getElementById('connect-wallet-btn');
+            if (connectWalletBtn) {
+                connectWalletBtn.addEventListener('click', function() {
+                    document.getElementById('walletConnectModal').classList.add('active');
+                });
+            }
+
+            // Обработчики для закрытия модальных окон
+            document.querySelectorAll('.close-modal').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.wallet-connect-modal').classList.remove('active');
+                    document.getElementById('allWalletsModal').classList.remove('active');
+                });
+            });
+
+            // Обработчик для кнопки "View all wallets"
+            const viewAllWalletsBtn = document.querySelector('.wallet-option[onclick="connectWallet(\'all\')"]');
+            if (viewAllWalletsBtn) {
+                viewAllWalletsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('walletConnectModal').classList.remove('active');
+                    document.getElementById('allWalletsModal').classList.add('active');
+                });
+            }
+
+            // Обработчик для кнопки копирования ссылки
+            const copyBtn = document.querySelector('.copy-btn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function() {
+                    navigator.clipboard.writeText('ton://connect').then(() => {
+                        alert('Link copied to clipboard!');
+                    });
+                });
+            }
+
+            // Обработчик для Trade Market карточки
+            const tradeMarketCard = document.getElementById('trade-market-card');
+            if (tradeMarketCard) {
+                tradeMarketCard.addEventListener('click', function() {
+                    // Здесь будет логика для открытия Trade Market
+                    console.log('Trade Market clicked');
+                });
+            }
+
+            // Обработчик для кнопки Create Collection
+            const createCollectionBtn = document.querySelector('.action-card');
+            if (createCollectionBtn) {
+                createCollectionBtn.addEventListener('click', function() {
+                    // Здесь будет логика для создания коллекции
+                    console.log('Create Collection clicked');
+                });
+            }
+
+            // Устанавливаем начальный активный таб
+            setActiveTab('nft');
         });
+
+        // Функция для подключения кошелька
+        function connectWallet(type) {
+            console.log('Connecting wallet:', type);
+            // Здесь будет логика подключения кошелька
+        }
+
+        // Функция для скрытия модального окна подключения кошелька
+        function hideWalletConnect() {
+            document.getElementById('walletConnectModal').classList.remove('active');
+        }
+
+        // Функция для скрытия модального окна со всеми кошельками
+        function hideAllWallets() {
+            document.getElementById('allWalletsModal').classList.remove('active');
+        }
+
+        // Функция для копирования в буфер обмена
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Link copied to clipboard!');
+            });
+        }
     </script>
 </body>
 </html> 

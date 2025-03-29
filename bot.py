@@ -31,6 +31,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_stats[user_id] = {
             'gifts_sold': 0,
             'gifts_bought': 0,
+            'gifts_for_sale': 0,
+            'total_sales_amount': 0,
+            'total_purchases_amount': 0,
             'rating': 5.0,
             'total_reviews': 0
         }
@@ -62,9 +65,16 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             stats = user_stats.get(user_id, {
                 'gifts_sold': 0,
                 'gifts_bought': 0,
+                'gifts_for_sale': 0,
+                'total_sales_amount': 0,
+                'total_purchases_amount': 0,
                 'rating': 5.0,
                 'total_reviews': 0
             })
+            
+            # Подсчитываем количество подарков на продаже
+            gifts_for_sale = sum(1 for gift_id in user_gift_ids if gift_id in gifts)
+            stats['gifts_for_sale'] = gifts_for_sale
             
             # Отправляем статистику обратно в веб-приложение
             await update.message.reply_text(
@@ -73,6 +83,9 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                     'total_gifts': len(user_gift_ids),
                     'gifts_sent': stats['gifts_sold'],
                     'gifts_received': stats['gifts_bought'],
+                    'gifts_for_sale': stats['gifts_for_sale'],
+                    'total_sales_amount': stats['total_sales_amount'],
+                    'total_purchases_amount': stats['total_purchases_amount'],
                     'rating': stats['rating'],
                     'total_reviews': stats['total_reviews']
                 })
@@ -82,13 +95,14 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         if data.get('action') == 'create_gift':
             # Create new gift
             gift_id = len(gifts) + 1
+            gift_price = float(data.get('price', 0))
             gifts[gift_id] = {
                 'id': gift_id,
                 'name': data.get('name'),
                 'model': data.get('model'),
                 'background': data.get('background'),
                 'pattern': data.get('pattern'),
-                'price': data.get('price'),
+                'price': gift_price,
                 'description': data.get('description'),
                 'seller': {
                     'id': user_id,
@@ -103,9 +117,12 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 user_gifts[user_id] = []
             user_gifts[user_id].append(gift_id)
 
+            # Обновляем статистику
+            user_stats[user_id]['gifts_for_sale'] += 1
+
             await update.message.reply_text(
                 f"🎉 Your gift '{data.get('name')}' has been created successfully!\n\n"
-                f"Price: {data.get('price')} TON\n"
+                f"Price: {gift_price} TON\n"
                 f"Model: {data.get('model')}\n"
                 f"Background: {data.get('background')}\n"
                 f"Pattern: {data.get('pattern')}\n\n"
@@ -121,6 +138,8 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 await update.message.reply_text("❌ Error: Gift not found.")
                 return
 
+            gift_price = float(gift['price'])
+
             # Добавляем подарок в список подарков покупателя
             buyer_id = user_id
             if buyer_id not in user_gifts:
@@ -129,7 +148,10 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
             # Обновляем статистику
             user_stats[buyer_id]['gifts_bought'] += 1
+            user_stats[buyer_id]['total_purchases_amount'] += gift_price
             user_stats[gift['seller']['id']]['gifts_sold'] += 1
+            user_stats[gift['seller']['id']]['total_sales_amount'] += gift_price
+            user_stats[gift['seller']['id']]['gifts_for_sale'] -= 1
 
             # Удаляем подарок из списка продавца
             seller_id = gift['seller']['id']
@@ -140,7 +162,7 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             await context.bot.send_message(
                 chat_id=seller_id,
                 text=f"🎁 New purchase!\n\n"
-                     f"Someone bought your gift '{gift['name']}' for {gift['price']} TON.\n"
+                     f"Someone bought your gift '{gift['name']}' for {gift_price} TON.\n"
                      f"Please check your TON wallet for the payment."
             )
 
@@ -148,7 +170,7 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             await update.message.reply_text(
                 f"🎉 Thank you for your purchase!\n\n"
                 f"Gift: {gift['name']}\n"
-                f"Price: {gift['price']} TON\n"
+                f"Price: {gift_price} TON\n"
                 f"Seller: {gift['seller']['name']}\n\n"
                 f"The payment has been processed successfully.\n\n"
                 f"Would you like to leave a review for the seller?",
@@ -205,6 +227,9 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             stats = user_stats.get(target_user_id, {
                 'gifts_sold': 0,
                 'gifts_bought': 0,
+                'gifts_for_sale': 0,
+                'total_sales_amount': 0,
+                'total_purchases_amount': 0,
                 'rating': 5.0,
                 'total_reviews': 0
             })
@@ -270,6 +295,9 @@ async def my_profile(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     stats = user_stats.get(user_id, {
         'gifts_sold': 0,
         'gifts_bought': 0,
+        'gifts_for_sale': 0,
+        'total_sales_amount': 0,
+        'total_purchases_amount': 0,
         'rating': 5.0,
         'total_reviews': 0
     })
@@ -281,6 +309,9 @@ async def my_profile(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     message += f"📊 Statistics:\n"
     message += f"Gifts Sold: {stats['gifts_sold']}\n"
     message += f"Gifts Bought: {stats['gifts_bought']}\n"
+    message += f"Gifts for Sale: {stats['gifts_for_sale']}\n"
+    message += f"Total Sales: {stats['total_sales_amount']} TON\n"
+    message += f"Total Purchases: {stats['total_purchases_amount']} TON\n"
     message += f"Rating: {stats['rating']} ⭐️\n"
     message += f"Total Reviews: {stats['total_reviews']}\n\n"
 

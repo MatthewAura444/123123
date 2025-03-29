@@ -599,17 +599,25 @@
             border-radius: 12px;
             padding: 16px;
             text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             margin-bottom: 4px;
+            color: var(--tg-theme-button-color, #2481cc);
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--tg-theme-hint-color, #999);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .connect-wallet-btn {
@@ -894,15 +902,23 @@
                 <div class="profile-stats">
                     <div class="stat-card">
                         <div class="stat-value" id="giftsSent">0</div>
-                        <div class="stat-label">Gifts Sent</div>
+                        <div class="stat-label">Gifts Sold</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="giftsReceived">0</div>
-                        <div class="stat-label">Gifts Received</div>
+                        <div class="stat-label">Gifts Bought</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="totalGifts">0</div>
-                        <div class="stat-label">Total Gifts</div>
+                        <div class="stat-value" id="giftsForSale">0</div>
+                        <div class="stat-label">For Sale</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSales">0 TON</div>
+                        <div class="stat-label">Total Sales</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPurchases">0 TON</div>
+                        <div class="stat-label">Total Purchases</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="userRating">5.0</div>
@@ -1270,9 +1286,13 @@
             try {
                 const data = JSON.parse(message);
                 if (data.action === 'stats_update') {
-                    document.getElementById('totalGifts').textContent = data.total_gifts;
                     document.getElementById('giftsSent').textContent = data.gifts_sent;
                     document.getElementById('giftsReceived').textContent = data.gifts_received;
+                    document.getElementById('giftsForSale').textContent = data.gifts_for_sale;
+                    document.getElementById('totalSales').textContent = `${data.total_sales_amount} TON`;
+                    document.getElementById('totalPurchases').textContent = `${data.total_purchases_amount} TON`;
+                    document.getElementById('userRating').textContent = data.rating;
+                    document.getElementById('totalReviews').textContent = data.total_reviews;
                 }
             } catch (error) {
                 console.error('Ошибка обработки сообщения:', error);

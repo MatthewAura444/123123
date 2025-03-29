@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fazer - Telegram Web App</title>
+    <title>TelegramGift - Telegram Web App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -47,11 +47,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Fazer</h1>
+            <h1>TelegramGift</h1>
         </div>
         <div class="content">
             <h2>Добро пожаловать!</h2>
-            <p>Это веб-приложение Fazer в Telegram.</p>
+            <p>Это веб-приложение TelegramGift в Telegram.</p>
             <button class="button" onclick="sendData()">Отправить данные</button>
         </div>
     </div>
@@ -62,7 +62,7 @@
 
         function sendData() {
             const data = {
-                message: "Hello from Fazer!",
+                message: "Hello from TelegramGift!",
                 timestamp: new Date().toISOString()
             };
             tg.sendData(JSON.stringify(data));

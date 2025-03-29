@@ -17,11 +17,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик команды /start"""
     try:
         keyboard = [
-            [InlineKeyboardButton("Открыть Fazer", web_app=WebAppInfo(url="https://matthewaura444.github.io/123123/public/telegram-app.html"))]
+            [InlineKeyboardButton("Открыть TelegramGift", web_app=WebAppInfo(url="https://matthewaura444.github.io/123123/public/telegram-app.html"))]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text(
-            "Добро пожаловать в Fazer! Нажмите на кнопку ниже, чтобы открыть приложение:",
+            "Добро пожаловать в TelegramGift! Нажмите на кнопку ниже, чтобы открыть приложение:",
             reply_markup=reply_markup
         )
     except Exception as e:
@@ -34,11 +34,11 @@ async def webapp(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик команды /webapp"""
     try:
         keyboard = [
-            [InlineKeyboardButton("Открыть Fazer", web_app=WebAppInfo(url="https://matthewaura444.github.io/123123/public/telegram-app.html"))]
+            [InlineKeyboardButton("Открыть TelegramGift", web_app=WebAppInfo(url="https://matthewaura444.github.io/123123/public/telegram-app.html"))]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text(
-            "Нажмите на кнопку ниже, чтобы открыть Fazer:",
+            "Нажмите на кнопку ниже, чтобы открыть TelegramGift:",
             reply_markup=reply_markup
         )
     except Exception as e:

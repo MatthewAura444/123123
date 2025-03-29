@@ -741,17 +741,15 @@
             height: 80px;
             border-radius: 50%;
             overflow: hidden;
-            background: var(--gradient-light);
-            position: relative;
-            box-shadow: var(--shadow-md);
-            border: 2px solid var(--glass-border);
-            transition: var(--animation-normal);
+            border: 3px solid var(--tg-theme-button-color, #0088cc);
+            transition: all 0.3s ease;
+            background-color: var(--tg-theme-secondary-bg-color, #2d2d2d);
         }
 
         .profile-avatar:hover {
             transform: scale(1.05);
-            border-color: var(--tg-theme-accent-text-color);
-            box-shadow: var(--shadow-lg);
+            border-color: var(--tg-theme-button-text-color, #ffffff);
+            box-shadow: 0 0 20px rgba(0, 136, 204, 0.3);
         }
 
         .profile-avatar img {
@@ -777,13 +775,13 @@
         }
 
         .profile-name {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            background: var(--gradient-primary);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color, #000000);
+            margin: 8px 0;
+            background: linear-gradient(45deg, var(--tg-theme-button-color, #0088cc), var(--tg-theme-secondary-bg-color, #a0a0a0));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .connect-wallet-btn {
@@ -1109,14 +1107,10 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background-size: cover;
-            background-position: center;
+            overflow: hidden;
             border: 3px solid var(--tg-theme-button-color, #0088cc);
             transition: all 0.3s ease;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-color: var(--tg-theme-secondary-bg-color, #2d2d2d);
         }
 
         .profile-name {
@@ -1329,22 +1323,27 @@
                 // Обновляем аватар пользователя
                 const profileAvatar = document.querySelector('.profile-avatar');
                 if (profileAvatar) {
+                    // Создаем элемент img для аватарки
+                    const avatarImg = document.createElement('img');
+                    avatarImg.style.width = '100%';
+                    avatarImg.style.height = '100%';
+                    avatarImg.style.objectFit = 'cover';
+                    
                     if (user.photo_url) {
-                        // Устанавливаем фото профиля как фон
-                        profileAvatar.style.backgroundImage = `url(${user.photo_url})`;
-                        profileAvatar.style.backgroundSize = 'cover';
-                        profileAvatar.style.backgroundPosition = 'center';
-                        profileAvatar.textContent = ''; // Очищаем текстовое содержимое
+                        // Устанавливаем фото профиля
+                        avatarImg.src = user.photo_url;
+                        avatarImg.alt = 'User avatar';
+                        profileAvatar.innerHTML = ''; // Очищаем содержимое
+                        profileAvatar.appendChild(avatarImg);
                     } else {
                         // Если фото нет, показываем первую букву имени
-                        profileAvatar.style.backgroundImage = 'none';
+                        profileAvatar.innerHTML = user.first_name.charAt(0).toUpperCase();
                         profileAvatar.style.backgroundColor = '#0088cc';
                         profileAvatar.style.color = 'white';
                         profileAvatar.style.display = 'flex';
                         profileAvatar.style.alignItems = 'center';
                         profileAvatar.style.justifyContent = 'center';
                         profileAvatar.style.fontSize = '24px';
-                        profileAvatar.textContent = user.first_name.charAt(0).toUpperCase();
                     }
                 }
             } else {

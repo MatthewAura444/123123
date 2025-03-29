@@ -52,24 +52,42 @@
         <div class="content">
             <h2>Добро пожаловать!</h2>
             <p>Это веб-приложение TelegramGift в Telegram.</p>
-            <button class="button" onclick="sendData()">Отправить данные</button>
+            <button class="button" id="mainButton">Отправить данные</button>
         </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand();
-
-        function sendData() {
-            const data = {
-                message: "Hello from TelegramGift!",
-                timestamp: new Date().toISOString()
-            };
-            tg.sendData(JSON.stringify(data));
-        }
 
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
+            // Активируем главную кнопку
+            tg.MainButton.text = "Отправить данные";
+            tg.MainButton.show();
+            tg.MainButton.enable();
+
+            // Обработчик нажатия на главную кнопку
+            tg.MainButton.onClick(function() {
+                const data = {
+                    message: "Hello from TelegramGift!",
+                    timestamp: new Date().toISOString()
+                };
+                tg.sendData(JSON.stringify(data));
+            });
+
+            // Обработчик нажатия на кнопку в интерфейсе
+            document.getElementById('mainButton').addEventListener('click', function() {
+                const data = {
+                    message: "Hello from TelegramGift!",
+                    timestamp: new Date().toISOString()
+                };
+                tg.sendData(JSON.stringify(data));
+            });
+
+            // Расширяем окно на весь экран
+            tg.expand();
+
+            // Сообщаем, что приложение готово
             tg.ready();
         });
     </script>

@@ -1,15 +1,30 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TelegramGift - Telegram Web App</title>
+    <title>TelegramGift</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
     <style>
         :root {
             --tg-theme-button-color: #2481cc;
             --tg-theme-button-text-color: #ffffff;
+            --tg-theme-bg-color: #ffffff;
+            --tg-theme-text-color: #000000;
+            --tg-theme-hint-color: #999999;
+            --tg-theme-link-color: #2481cc;
+            --tg-theme-secondary-bg-color: #f0f0f0;
+            --tg-theme-header-bg-color: #ffffff;
+            --tg-theme-accent-text-color: #2481cc;
+            --tg-theme-section-bg-color: #ffffff;
+            --tg-theme-section-header-text-color: #000000;
+            --tg-theme-subtitle-text-color: #999999;
+            --tg-theme-destructive-text-color: #ff3b30;
+            --tg-theme-success-text-color: #00c853;
+            --tg-theme-warning-text-color: #ffd700;
+            --tg-theme-shadow-color: rgba(0, 0, 0, 0.1);
+            --tg-theme-border-color: rgba(0, 0, 0, 0.1);
         }
 
         * {
@@ -20,8 +35,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
@@ -29,41 +44,50 @@
         .app-container {
             max-width: 100%;
             margin: 0 auto;
-            padding: 16px;
+            padding: 0;
         }
 
         .header {
-            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            background: var(--tg-theme-header-bg-color);
+            padding: 16px;
             text-align: center;
-            position: relative;
-            margin-bottom: 24px;
+            border-bottom: 1px solid var(--tg-theme-border-color);
+            z-index: 100;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
         }
 
         .header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--tg-theme-text-color, #000000);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color);
             margin: 0;
         }
 
         .nav-tabs {
             display: flex;
-            justify-content: center;
-            margin-bottom: 24px;
-            border-bottom: 1px solid var(--tg-theme-hint-color, rgba(0, 0, 0, 0.1));
+            background: var(--tg-theme-bg-color);
+            padding: 0 16px;
+            border-bottom: 1px solid var(--tg-theme-border-color);
+            position: sticky;
+            top: 52px;
+            z-index: 99;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
         }
 
         .nav-tab {
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 12px 16px;
+            font-size: 15px;
             font-weight: 500;
-            color: var(--tg-theme-hint-color, #999);
+            color: var(--tg-theme-hint-color);
             cursor: pointer;
             position: relative;
+            transition: all 0.2s ease;
         }
 
         .nav-tab.active {
-            color: var(--tg-theme-text-color, #000);
+            color: var(--tg-theme-accent-text-color);
         }
 
         .nav-tab.active:after {
@@ -73,11 +97,12 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: var(--tg-theme-button-color, #2481cc);
+            background: var(--tg-theme-accent-text-color);
         }
 
         .tab-content {
             display: none;
+            padding: 16px;
         }
 
         .tab-content.active {
@@ -85,163 +110,52 @@
         }
 
         .create-gift-btn {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #fff);
+            background: var(--tg-theme-accent-text-color);
+            color: var(--tg-theme-button-text-color);
             border: none;
             border-radius: 8px;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 12px 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             width: 100%;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
         }
 
-        .create-gift-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .gift-details {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--tg-theme-bg-color, #fff);
-            z-index: 1000;
-            padding: 20px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .gift-details.active {
-            display: block;
-        }
-
-        .gift-details-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .gift-details-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--tg-theme-text-color, #000);
-        }
-
-        .gift-details-content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .gift-details-image {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        .gift-details-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .gift-details-info {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .gift-details-title {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .gift-details-price {
-            font-size: 20px;
-            font-weight: 500;
-            color: var(--tg-theme-button-color, #2481cc);
-        }
-
-        .gift-details-seller {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            border-radius: 12px;
-        }
-
-        .seller-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            background: var(--tg-theme-button-color, #2481cc);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        .seller-info {
-            flex: 1;
-        }
-
-        .seller-name {
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .seller-rating {
-            font-size: 14px;
-            color: var(--tg-theme-hint-color, #999);
-        }
-
-        .gift-details-description {
-            font-size: 16px;
-            line-height: 1.5;
-        }
-
-        .gift-details-actions {
-            margin-top: 20px;
-            display: flex;
-            gap: 12px;
-        }
-
-        .buy-gift-btn {
-            flex: 1;
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #fff);
-            border: none;
-            border-radius: 8px;
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
+        .create-gift-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
         .create-gift-form {
             display: none;
             padding: 20px;
-            background: var(--tg-theme-bg-color, #fff);
+            background: var(--tg-theme-bg-color);
             border-radius: 16px;
             margin-bottom: 24px;
+            box-shadow: 0 4px 6px var(--tg-theme-shadow-color);
         }
 
         .create-gift-form.active {
             display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .form-group {
@@ -252,84 +166,97 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
+            color: var(--tg-theme-text-color);
+            font-size: 14px;
         }
 
         .form-input {
             width: 100%;
             padding: 12px;
-            border: 1px solid var(--tg-theme-hint-color, #999);
+            border: 1px solid var(--tg-theme-border-color);
             border-radius: 8px;
-            background: var(--tg-theme-bg-color, #fff);
-            color: var(--tg-theme-text-color, #000);
+            background: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--tg-theme-accent-text-color);
+            box-shadow: 0 0 0 2px rgba(36, 129, 204, 0.1);
         }
 
         .form-textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid var(--tg-theme-hint-color, #999);
+            border: 1px solid var(--tg-theme-border-color);
             border-radius: 8px;
-            background: var(--tg-theme-bg-color, #fff);
-            color: var(--tg-theme-text-color, #000);
+            background: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
             min-height: 100px;
             resize: vertical;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--tg-theme-accent-text-color);
+            box-shadow: 0 0 0 2px rgba(36, 129, 204, 0.1);
         }
 
         .form-actions {
             display: flex;
             gap: 12px;
+            margin-top: 24px;
         }
 
         .form-submit-btn {
             flex: 1;
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #fff);
+            background: var(--tg-theme-accent-text-color);
+            color: var(--tg-theme-button-text-color);
             border: none;
             border-radius: 8px;
             padding: 12px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
+        }
+
+        .form-submit-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
         .form-cancel-btn {
             flex: 1;
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            color: var(--tg-theme-text-color, #000);
-            border: none;
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            border: 1px solid var(--tg-theme-border-color);
             border-radius: 8px;
             padding: 12px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .gift-card .seller-info {
-            padding: 8px 12px;
-            border-top: 1px solid var(--tg-theme-hint-color, rgba(0, 0, 0, 0.1));
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .gift-card .seller-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 12px;
-            font-size: 12px;
-        }
-
-        .gift-card .seller-name {
-            font-size: 14px;
-            margin: 0;
+        .form-cancel-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
         .categories {
             display: flex;
             overflow-x: auto;
             padding: 8px 0;
-            margin-bottom: 24px;
+            margin: 0 -16px 16px -16px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+            background: var(--tg-theme-bg-color);
         }
 
         .categories::-webkit-scrollbar {
@@ -340,34 +267,37 @@
             flex: 0 0 auto;
             padding: 8px 16px;
             margin-right: 8px;
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            background: var(--tg-theme-secondary-bg-color);
             border-radius: 16px;
             font-size: 14px;
             font-weight: 500;
-            color: var(--tg-theme-text-color, #000000);
+            color: var(--tg-theme-text-color);
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
         }
 
         .category.active {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
+            background: var(--tg-theme-accent-text-color);
+            color: var(--tg-theme-button-text-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
         }
 
         .gifts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 12px;
             padding: 0 0 16px 0;
         }
 
         .gift-card {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            border-radius: 16px;
+            background: var(--tg-theme-section-bg-color);
+            border-radius: 12px;
             overflow: hidden;
-            transition: transform 0.2s ease;
+            transition: all 0.2s ease;
             position: relative;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
         }
 
         .gift-card:active {
@@ -378,7 +308,7 @@
             width: 100%;
             padding-top: 100%;
             position: relative;
-            background: var(--tg-theme-bg-color, #ffffff);
+            background: var(--tg-theme-secondary-bg-color);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -399,28 +329,56 @@
         }
 
         .gift-name {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             margin-bottom: 4px;
-            color: var(--tg-theme-text-color, #000000);
+            color: var(--tg-theme-text-color);
         }
 
         .gift-price {
             font-size: 14px;
             font-weight: 500;
-            color: var(--tg-theme-hint-color, #999);
+            color: var(--tg-theme-accent-text-color);
         }
 
         .gift-badge {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
+            top: 8px;
+            right: 8px;
+            background: var(--tg-theme-accent-text-color);
+            color: var(--tg-theme-button-text-color);
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 500;
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
+        }
+
+        .seller-info {
+            padding: 8px 12px;
+            border-top: 1px solid var(--tg-theme-border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--tg-theme-secondary-bg-color);
+        }
+
+        .seller-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 12px;
+            background: var(--tg-theme-accent-text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .seller-name {
+            font-size: 13px;
+            color: var(--tg-theme-text-color);
         }
 
         @media (min-width: 768px) {
@@ -435,24 +393,213 @@
             }
         }
 
-        .profile-section {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            border-radius: 16px;
+        .gift-details {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--tg-theme-bg-color);
+            z-index: 1000;
             padding: 20px;
+            overflow-y: auto;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .gift-details.active {
+            display: block;
+        }
+
+        .gift-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--tg-theme-border-color);
+        }
+
+        .gift-details-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--tg-theme-text-color);
+            padding: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .gift-details-close:hover {
+            color: var(--tg-theme-destructive-text-color);
+        }
+
+        .gift-details-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .gift-details-image {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px var(--tg-theme-shadow-color);
+        }
+
+        .gift-details-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gift-details-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .gift-details-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color);
+        }
+
+        .gift-details-price {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--tg-theme-accent-text-color);
+        }
+
+        .gift-details-seller {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .gift-details-seller:hover {
+            transform: translateY(-1px);
+        }
+
+        .seller-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: var(--tg-theme-accent-text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
+        }
+
+        .seller-info {
+            flex: 1;
+        }
+
+        .seller-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--tg-theme-text-color);
+        }
+
+        .seller-rating {
+            font-size: 14px;
+            color: var(--tg-theme-subtitle-text-color);
+        }
+
+        .gift-details-description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--tg-theme-text-color);
+            padding: 16px;
+            background: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+        }
+
+        .gift-details-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .buy-gift-btn {
+            flex: 1;
+            background: var(--tg-theme-accent-text-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
+        }
+
+        .buy-gift-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .buy-gift-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (min-width: 768px) {
+            .gift-details-content {
+                flex-direction: row;
+            }
+
+            .gift-details-image {
+                flex: 1;
+            }
+
+            .gift-details-info {
+                flex: 1;
+                padding-left: 24px;
+            }
+        }
+
+        .profile-section {
+            background: var(--tg-theme-section-bg-color);
+            border-radius: 12px;
+            padding: 16px;
             margin-bottom: 16px;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
         }
 
         .profile-header {
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--tg-theme-border-color);
         }
 
         .profile-avatar {
             width: 64px;
             height: 64px;
             border-radius: 32px;
-            background: var(--tg-theme-button-color, #2481cc);
+            background: var(--tg-theme-accent-text-color);
             margin-right: 16px;
             display: flex;
             align-items: center;
@@ -460,24 +607,34 @@
             color: white;
             font-weight: bold;
             font-size: 24px;
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
+            transition: transform 0.2s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
         }
 
         .profile-info h2 {
             margin: 0;
-            font-size: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--tg-theme-section-header-text-color);
             margin-bottom: 4px;
         }
 
         .profile-info p {
             margin: 0;
-            color: var(--tg-theme-hint-color, #999);
+            color: var(--tg-theme-subtitle-text-color);
+            font-size: 14px;
         }
 
         .wallet-section {
-            background: var(--tg-theme-bg-color, #fff);
+            background: var(--tg-theme-secondary-bg-color);
             border-radius: 12px;
             padding: 16px;
             margin-top: 16px;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
         }
 
         .wallet-header {
@@ -485,20 +642,26 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--tg-theme-border-color);
         }
 
         .wallet-balance {
             font-size: 24px;
-            font-weight: bold;
+            font-weight: 700;
+            color: var(--tg-theme-section-header-text-color);
         }
 
         .wallet-address {
             font-family: monospace;
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            padding: 8px;
+            background: var(--tg-theme-bg-color);
+            padding: 8px 12px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             word-break: break-all;
+            color: var(--tg-theme-text-color);
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px var(--tg-theme-shadow-color);
         }
 
         .wallet-actions {
@@ -509,8 +672,8 @@
 
         .wallet-action-btn {
             flex: 1;
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #fff);
+            background: var(--tg-theme-accent-text-color);
+            color: var(--tg-theme-button-text-color);
             border: none;
             border-radius: 8px;
             padding: 12px;
@@ -521,16 +684,24 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
+        }
+
+        .wallet-action-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .wallet-action-btn.secondary {
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            border: 1px solid var(--tg-theme-border-color);
         }
 
         .wallet-action-btn svg {
             width: 16px;
             height: 16px;
-        }
-
-        .wallet-action-btn.secondary {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            color: var(--tg-theme-text-color, #000);
         }
 
         .transaction-history {
@@ -541,6 +712,7 @@
             margin-bottom: 16px;
             font-size: 16px;
             font-weight: 600;
+            color: var(--tg-theme-section-header-text-color);
         }
 
         .transaction-list {
@@ -550,12 +722,18 @@
         }
 
         .transaction-item {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            background: var(--tg-theme-bg-color);
             border-radius: 12px;
             padding: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
+            transition: transform 0.2s ease;
+        }
+
+        .transaction-item:hover {
+            transform: translateY(-1px);
         }
 
         .transaction-info {
@@ -567,11 +745,12 @@
         .transaction-type {
             font-weight: 500;
             font-size: 14px;
+            color: var(--tg-theme-text-color);
         }
 
         .transaction-date {
             font-size: 12px;
-            color: var(--tg-theme-hint-color, #999);
+            color: var(--tg-theme-subtitle-text-color);
         }
 
         .transaction-amount {
@@ -580,11 +759,11 @@
         }
 
         .transaction-amount.positive {
-            color: #00c853;
+            color: var(--tg-theme-success-text-color);
         }
 
         .transaction-amount.negative {
-            color: #ff3d00;
+            color: var(--tg-theme-destructive-text-color);
         }
 
         .profile-stats {
@@ -595,54 +774,65 @@
         }
 
         .stat-card {
-            background: var(--tg-theme-bg-color, #fff);
+            background: var(--tg-theme-bg-color);
             border-radius: 12px;
             padding: 16px;
             text-align: center;
-            transition: transform 0.2s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
         }
 
         .stat-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 6px var(--tg-theme-shadow-color);
         }
 
         .stat-value {
             font-size: 20px;
-            font-weight: bold;
+            font-weight: 700;
             margin-bottom: 4px;
-            color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-accent-text-color);
         }
 
         .stat-label {
             font-size: 12px;
-            color: var(--tg-theme-hint-color, #999);
+            color: var(--tg-theme-subtitle-text-color);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .connect-wallet-btn {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #fff);
+            background: var(--tg-theme-accent-text-color);
+            color: var(--tg-theme-button-text-color);
             border: none;
             border-radius: 8px;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 12px 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             width: 100%;
             margin-top: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
+        }
+
+        .connect-wallet-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
         .connect-wallet-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
         }
 
         .reviews-section {
             margin-top: 24px;
-            background: var(--tg-theme-bg-color, #fff);
+            background: var(--tg-theme-bg-color);
             border-radius: 12px;
             padding: 16px;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
         }
 
         .reviews-list {
@@ -652,9 +842,14 @@
         }
 
         .review-item {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            background: var(--tg-theme-secondary-bg-color);
             border-radius: 12px;
             padding: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .review-item:hover {
+            transform: translateY(-1px);
         }
 
         .review-header {
@@ -666,21 +861,23 @@
 
         .review-author {
             font-weight: 500;
+            color: var(--tg-theme-text-color);
         }
 
         .review-date {
             font-size: 12px;
-            color: var(--tg-theme-hint-color, #999);
+            color: var(--tg-theme-subtitle-text-color);
         }
 
         .review-rating {
-            color: #ffd700;
+            color: var(--tg-theme-warning-text-color);
             margin-bottom: 8px;
         }
 
         .review-text {
             font-size: 14px;
             line-height: 1.5;
+            color: var(--tg-theme-text-color);
         }
 
         .review-modal {
@@ -701,11 +898,12 @@
         }
 
         .review-modal-content {
-            background: var(--tg-theme-bg-color, #fff);
+            background: var(--tg-theme-bg-color);
             border-radius: 16px;
             padding: 24px;
             width: 90%;
             max-width: 400px;
+            box-shadow: 0 4px 6px var(--tg-theme-shadow-color);
         }
 
         .rating-stars {
@@ -718,20 +916,23 @@
             font-size: 24px;
             cursor: pointer;
             color: #ddd;
+            transition: color 0.2s ease;
         }
 
         .star.active {
-            color: #ffd700;
+            color: var(--tg-theme-warning-text-color);
         }
 
         #reviewComment {
             width: 100%;
             min-height: 100px;
             padding: 12px;
-            border: 1px solid var(--tg-theme-hint-color, #999);
+            border: 1px solid var(--tg-theme-border-color);
             border-radius: 8px;
             margin-bottom: 16px;
             resize: vertical;
+            background: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
         }
 
         .review-modal-actions {
@@ -746,23 +947,32 @@
             border-radius: 8px;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .review-modal-actions button:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
         #submitReviewBtn {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #fff);
+            background: var(--tg-theme-accent-text-color);
+            color: var(--tg-theme-button-text-color);
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
         }
 
         #cancelReviewBtn {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            color: var(--tg-theme-text-color, #000);
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            border: 1px solid var(--tg-theme-border-color);
         }
 
         .my-gifts-section {
             margin: 24px 0;
-            background: var(--tg-theme-bg-color, #fff);
+            background: var(--tg-theme-bg-color);
             border-radius: 12px;
             padding: 16px;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
         }
 
         .my-gifts-grid {
@@ -773,10 +983,17 @@
         }
 
         .my-gift-card {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            background: var(--tg-theme-secondary-bg-color);
             border-radius: 12px;
             padding: 16px;
             position: relative;
+            box-shadow: 0 1px 3px var(--tg-theme-shadow-color);
+            transition: all 0.2s ease;
+        }
+
+        .my-gift-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px var(--tg-theme-shadow-color);
         }
 
         .my-gift-image {
@@ -801,19 +1018,21 @@
 
         .my-gift-name {
             font-weight: 500;
-            font-size: 16px;
+            font-size: 15px;
+            color: var(--tg-theme-text-color);
         }
 
         .my-gift-price {
-            color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-accent-text-color);
             font-weight: 500;
+            font-size: 14px;
         }
 
         .delete-gift-btn {
             position: absolute;
             top: 8px;
             right: 8px;
-            background: rgba(255, 59, 48, 0.9);
+            background: var(--tg-theme-destructive-text-color);
             color: white;
             border: none;
             border-radius: 20px;
@@ -824,11 +1043,13 @@
             justify-content: center;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px var(--tg-theme-shadow-color);
         }
 
         .delete-gift-btn:hover {
-            background: rgba(255, 59, 48, 1);
+            transform: scale(1.1);
+            opacity: 0.9;
         }
 
         @media (min-width: 768px) {

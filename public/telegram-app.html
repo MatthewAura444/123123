@@ -262,6 +262,117 @@
             word-break: break-all;
         }
 
+        .wallet-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .wallet-action-btn {
+            flex: 1;
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .wallet-action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .wallet-action-btn.secondary {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000);
+        }
+
+        .transaction-history {
+            margin-top: 24px;
+        }
+
+        .transaction-history h3 {
+            margin-bottom: 16px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .transaction-item {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .transaction-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .transaction-type {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #999);
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .transaction-amount.positive {
+            color: #00c853;
+        }
+
+        .transaction-amount.negative {
+            color: #ff3d00;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: var(--tg-theme-bg-color, #fff);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #999);
+        }
+
         .connect-wallet-btn {
             background: var(--tg-theme-button-color, #2481cc);
             color: var(--tg-theme-button-text-color, #fff);
@@ -331,7 +442,39 @@
                             <div class="wallet-address" id="walletAddress">
                                 Загрузка адреса...
                             </div>
+                            <div class="wallet-actions">
+                                <button class="wallet-action-btn" id="sendTonBtn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 4v16m0-16l-4 4m4-4l4 4m-4 12l-4-4m4 4l4-4"/>
+                                    </svg>
+                                    Отправить
+                                </button>
+                                <button class="wallet-action-btn secondary" id="receiveTonBtn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 20V4m0 16l4-4m-4 4l-4-4m4-16l-4 4m4-4l4 4"/>
+                                    </svg>
+                                    Получить
+                                </button>
+                            </div>
                         </div>
+
+                        <div class="transaction-history">
+                            <h3>История транзакций</h3>
+                            <div class="transaction-list" id="transactionList">
+                                <!-- Транзакции будут добавлены через JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="giftsSent">0</div>
+                        <div class="stat-label">Отправлено подарков</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="giftsReceived">0</div>
+                        <div class="stat-label">Получено подарков</div>
                     </div>
                 </div>
             </div>
@@ -352,6 +495,16 @@
             if (walletConnectionSource) {
                 await connectWallet();
             }
+
+            // Подписываемся на события кошелька
+            connector.onStatusChange(wallet => {
+                if (wallet) {
+                    updateWalletInfo(wallet);
+                } else {
+                    document.getElementById('walletNotConnected').style.display = 'block';
+                    document.getElementById('walletConnected').style.display = 'none';
+                }
+            });
         }
 
         // Подключение кошелька
@@ -385,6 +538,92 @@
             }
         }
 
+        // Обновление информации о кошельке
+        async function updateWalletInfo(wallet) {
+            document.getElementById('walletNotConnected').style.display = 'none';
+            document.getElementById('walletConnected').style.display = 'block';
+            
+            const walletAddress = wallet.account.address;
+            document.getElementById('walletAddress').textContent = walletAddress;
+            
+            await updateBalance();
+            await loadTransactionHistory();
+        }
+
+        // Загрузка истории транзакций
+        async function loadTransactionHistory() {
+            try {
+                const transactions = await connector.getTransactions();
+                const transactionList = document.getElementById('transactionList');
+                transactionList.innerHTML = '';
+
+                transactions.forEach(transaction => {
+                    const transactionElement = document.createElement('div');
+                    transactionElement.className = 'transaction-item';
+                    
+                    const amount = transaction.amount / 1000000000; // Конвертируем из нановатов в TON
+                    const isPositive = transaction.type === 'receive';
+                    
+                    transactionElement.innerHTML = `
+                        <div class="transaction-info">
+                            <div class="transaction-type">${transaction.type === 'send' ? 'Отправка' : 'Получение'}</div>
+                            <div class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</div>
+                        </div>
+                        <div class="transaction-amount ${isPositive ? 'positive' : 'negative'}">
+                            ${isPositive ? '+' : '-'}${amount.toFixed(2)} TON
+                        </div>
+                    `;
+                    
+                    transactionList.appendChild(transactionElement);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки истории транзакций:', error);
+            }
+        }
+
+        // Отправка TON
+        async function sendTon() {
+            try {
+                const amount = prompt('Введите количество TON для отправки:');
+                if (!amount) return;
+
+                const amountInNano = Math.floor(parseFloat(amount) * 1000000000);
+                const recipientAddress = prompt('Введите адрес получателя:');
+                if (!recipientAddress) return;
+
+                await connector.sendTransaction({
+                    validUntil: Math.floor(Date.now() / 1000) + 60,
+                    messages: [
+                        {
+                            address: recipientAddress,
+                            amount: amountInNano
+                        }
+                    ]
+                });
+
+                await updateBalance();
+                await loadTransactionHistory();
+            } catch (error) {
+                console.error('Ошибка отправки TON:', error);
+                alert('Ошибка при отправке TON. Попробуйте позже.');
+            }
+        }
+
+        // Получение QR-кода для получения TON
+        async function receiveTon() {
+            try {
+                const walletAddress = await connector.getWalletConnectionSource();
+                if (walletAddress) {
+                    const qrCode = await connector.getQRCode();
+                    // Здесь можно добавить отображение QR-кода
+                    alert(`Ваш адрес для получения TON: ${walletAddress.account.address}`);
+                }
+            } catch (error) {
+                console.error('Ошибка получения QR-кода:', error);
+                alert('Ошибка при получении адреса. Попробуйте позже.');
+            }
+        }
+
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
             // Инициализируем TON Connect
@@ -413,6 +652,13 @@
 
             // Обработчик подключения кошелька
             document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
+
+            // Обработчики кнопок кошелька
+            document.getElementById('sendTonBtn').addEventListener('click', sendTon);
+            document.getElementById('receiveTonBtn').addEventListener('click', receiveTon);
+
+            // Загрузка статистики пользователя
+            loadUserStats();
 
             // Список доступных подарков
             const gifts = [
@@ -491,6 +737,18 @@
                 }
             }
         });
+
+        // Загрузка статистики пользователя
+        async function loadUserStats() {
+            try {
+                // Здесь можно добавить запрос к API для получения статистики
+                // Пока используем тестовые данные
+                document.getElementById('giftsSent').textContent = '12';
+                document.getElementById('giftsReceived').textContent = '8';
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+            }
+        }
 
         // Функция выбора подарка
         function selectGift(gift) {

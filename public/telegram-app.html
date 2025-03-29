@@ -1113,6 +1113,7 @@
             background-position: center;
             border: 3px solid var(--tg-theme-button-color, #0088cc);
             transition: all 0.3s ease;
+            overflow: hidden;
         }
 
         .profile-name {
@@ -1305,14 +1306,13 @@
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        
         document.addEventListener('DOMContentLoaded', function() {
             // Инициализация Telegram Web App
-            window.Telegram.WebApp.ready();
+            const tg = window.Telegram.WebApp;
+            tg.ready();
             
             // Получаем данные пользователя
-            const user = window.Telegram.WebApp.initDataUnsafe.user;
+            const user = tg.initDataUnsafe.user;
             if (user) {
                 // Обновляем имя пользователя
                 const profileName = document.querySelector('.profile-name');
@@ -1324,240 +1324,29 @@
                 const profileAvatar = document.querySelector('.profile-avatar');
                 if (profileAvatar) {
                     if (user.photo_url) {
+                        // Устанавливаем фото профиля как фон
                         profileAvatar.style.backgroundImage = `url(${user.photo_url})`;
+                        profileAvatar.style.backgroundSize = 'cover';
+                        profileAvatar.style.backgroundPosition = 'center';
+                        profileAvatar.textContent = ''; // Очищаем текстовое содержимое
                     } else {
-                        // Если аватарка отсутствует, показываем первую букву имени
-                        profileAvatar.textContent = user.first_name.charAt(0).toUpperCase();
+                        // Если фото нет, показываем первую букву имени
+                        profileAvatar.style.backgroundImage = 'none';
                         profileAvatar.style.backgroundColor = '#0088cc';
                         profileAvatar.style.color = 'white';
                         profileAvatar.style.display = 'flex';
                         profileAvatar.style.alignItems = 'center';
                         profileAvatar.style.justifyContent = 'center';
                         profileAvatar.style.fontSize = '24px';
+                        profileAvatar.textContent = user.first_name.charAt(0).toUpperCase();
                     }
                 }
-            }
 
-            // Обновляем цветовую схему
-            const colorScheme = window.Telegram.WebApp.colorScheme;
-            document.documentElement.setAttribute('data-theme', colorScheme);
-
-            // Показываем основной контент
-            document.body.style.visibility = 'visible';
-
-            // Функция для обновления статистики Trade Market
-            function updateTradeMarketStats() {
-                // Здесь будет запрос к серверу для получения реальных данных
-                fetch('/api/trade-market-stats')
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('active-sellers').textContent = data.sellers;
-                        document.getElementById('active-gifts').textContent = data.gifts;
-                    })
-                    .catch(error => console.error('Ошибка при получении статистики:', error));
-            }
-
-            // Обновляем статистику каждые 5 секунд
-            setInterval(updateTradeMarketStats, 5000);
-
-            // Инициализация активного таба
-            function setActiveTab(tabId) {
-                document.querySelectorAll('.nav-tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                    content.style.display = 'none';
-                });
-                
-                const selectedTab = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
-                const selectedContent = document.getElementById(`${tabId}-tab`);
-                
-                if (selectedTab && selectedContent) {
-                    selectedTab.classList.add('active');
-                    selectedContent.classList.add('active');
-                    selectedContent.style.display = 'block';
-                }
-            }
-
-            // Обработчик кликов по табам
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.dataset.tab;
-                    setActiveTab(tabId);
-                });
-            });
-
-            // Обработчик клика по Trade Market
-            document.getElementById('trade-market-card').addEventListener('click', function() {
-                // Здесь будет запрос на получение списка подарков
-                fetch('/api/trade-market-gifts')
-                    .then(response => response.json())
-                    .then(gifts => {
-                        // Отображаем подарки в интерфейсе
-                        displayTradeMarketGifts(gifts);
-                    })
-                    .catch(error => console.error('Ошибка при получении подарков:', error));
-            });
-
-            // Функция для отображения подарков
-            function displayTradeMarketGifts(gifts) {
-                const container = document.createElement('div');
-                container.className = 'trade-market-gifts';
-                
-                gifts.forEach(gift => {
-                    const giftCard = document.createElement('div');
-                    giftCard.className = 'gift-card';
-                    giftCard.innerHTML = `
-                        <div class="gift-image">
-                            <img src="${gift.image}" alt="${gift.name}">
-                        </div>
-                        <div class="gift-info">
-                            <div class="gift-name">${gift.name}</div>
-                            <div class="gift-price">${gift.price} TON</div>
-                            <div class="gift-seller">Продавец: ${gift.seller}</div>
-                        </div>
-                    `;
-                    container.appendChild(giftCard);
-                });
-
-                // Показываем модальное окно с подарками
-                const modal = document.createElement('div');
-                modal.className = 'trade-market-modal active';
-                modal.appendChild(container);
-                document.body.appendChild(modal);
-
-                // Добавляем возможность закрыть модальное окно
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) {
-                        modal.remove();
-                    }
-                });
-            }
-
-            // Функция для показа коллекций
-            function showMyCollections() {
-                setActiveTab('collections');
-            }
-
-            // Добавляем обработчик для таба Collections
-            document.querySelector('.nav-tab[data-tab="collections"]').addEventListener('click', showMyCollections);
-
-            // Устанавливаем начальный активный таб
-            setActiveTab('nft');
-
-            // Настраиваем Telegram Web App
-            tg.expand();
-            tg.ready();
-
-            function showWalletConnect() {
-                document.getElementById('walletConnectModal').classList.add('active');
-            }
-
-            function hideWalletConnect() {
-                document.getElementById('walletConnectModal').classList.remove('active');
-            }
-
-            function copyToClipboard(text) {
-                navigator.clipboard.writeText(text).then(() => {
-                    // Можно добавить уведомление об успешном копировании
-                    alert('Link copied to clipboard!');
-                });
-            }
-
-            // Инициализация TON Connect
-            const connector = new TonConnect({
-                manifestUrl: 'https://matthewaura444.github.io/123123/public/tonconnect-manifest.json'
-            });
-
-            // Функция подключения кошелька
-            async function connectWallet() {
-                try {
-                    // Проверяем, доступен ли Telegram Wallet
-                    if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-                        // Создаем запрос на подключение через Telegram Wallet
-                        const universalLink = 'ton://connect?v=2&r=https://t.me/wallet';
-                        window.Telegram.WebApp.openTelegramLink(universalLink);
-                        
-                        // Ждем подключения
-                        const wallet = await connector.connect({
-                            universalLink: universalLink,
-                            bridgeUrl: 'https://bridge.tonapi.io/bridge'
-                        });
-                        
-                        if (wallet) {
-                            // Получаем адрес кошелька
-                            const walletAddress = wallet.account.address;
-                            
-                            // Обновляем интерфейс
-                            document.getElementById('wallet-status').textContent = `Подключен: ${walletAddress}`;
-                            document.getElementById('connect-wallet-btn').style.display = 'none';
-                            
-                            // Сохраняем информацию
-                            localStorage.setItem('walletConnected', 'true');
-                            localStorage.setItem('walletAddress', walletAddress);
-                        }
-                    } else {
-                        alert('Пожалуйста, откройте это приложение в Telegram');
-                    }
-                } catch (error) {
-                    console.error('Ошибка при подключении кошелька:', error);
-                    alert('Ошибка при подключении кошелька. Попробуйте еще раз.');
-                }
-            }
-
-            // Добавляем обработчик для кнопки подключения
-            document.addEventListener('DOMContentLoaded', function() {
-                const connectButton = document.getElementById('connect-wallet-btn');
-                if (connectButton) {
-                    connectButton.addEventListener('click', connectWallet);
-                }
-                
-                // Проверяем предыдущее подключение
-                const isWalletConnected = localStorage.getItem('walletConnected');
-                const walletAddress = localStorage.getItem('walletAddress');
-                
-                if (isWalletConnected && walletAddress) {
-                    document.getElementById('wallet-status').textContent = `Подключен: ${walletAddress}`;
-                    document.getElementById('connect-wallet-btn').style.display = 'none';
-                }
-            });
-
-            // Функция для отображения всех кошельков
-            function showAllWallets() {
-                document.getElementById('allWalletsModal').classList.add('active');
-                hideWalletConnect();
-            }
-
-            // Функция для скрытия всех кошельков
-            function hideAllWallets() {
-                document.getElementById('allWalletsModal').classList.remove('active');
-            }
-
-            // Инициализация Lottie анимации подарка
-            const giftAnimation = lottie.loadAnimation({
-                container: document.getElementById('giftAnimation'),
-                renderer: 'svg',
-                loop: true,
-                autoplay: true,
-                path: 'gift-animation.json' // Используем локальную анимацию
-            });
-
-            // Добавляем эффекты при наведении
-            const actionCard = document.querySelector('.action-card');
-            if (actionCard && giftAnimation) {
-                actionCard.addEventListener('mouseenter', () => {
-                    giftAnimation.setSpeed(1.5);
-                    giftAnimation.play();
-                });
-                
-                actionCard.addEventListener('mouseleave', () => {
-                    giftAnimation.setSpeed(1);
-                });
-
-                // Запускаем анимацию сразу после загрузки
-                giftAnimation.play();
+                // Выводим информацию в консоль для отладки
+                console.log('User data:', user);
+                console.log('Photo URL:', user.photo_url);
+            } else {
+                console.log('User data not available');
             }
         });
     </script>

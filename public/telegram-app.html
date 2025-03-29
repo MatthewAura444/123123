@@ -1114,6 +1114,9 @@
             border: 3px solid var(--tg-theme-button-color, #0088cc);
             transition: all 0.3s ease;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .profile-name {
@@ -1313,6 +1316,9 @@
             
             // Получаем данные пользователя
             const user = tg.initDataUnsafe.user;
+            console.log('Telegram Web App:', tg);
+            console.log('User data:', user);
+            
             if (user) {
                 // Обновляем имя пользователя
                 const profileName = document.querySelector('.profile-name');
@@ -1341,13 +1347,16 @@
                         profileAvatar.textContent = user.first_name.charAt(0).toUpperCase();
                     }
                 }
-
-                // Выводим информацию в консоль для отладки
-                console.log('User data:', user);
-                console.log('Photo URL:', user.photo_url);
             } else {
                 console.log('User data not available');
             }
+
+            // Обновляем цветовую схему
+            const colorScheme = tg.colorScheme;
+            document.documentElement.setAttribute('data-theme', colorScheme);
+
+            // Показываем основной контент
+            document.body.style.visibility = 'visible';
         });
     </script>
 </body>

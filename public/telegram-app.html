@@ -1539,6 +1539,38 @@
             // Инициализируем Telegram Web App
             tg.ready();
             
+            // Получаем данные пользователя
+            const user = tg.initDataUnsafe.user;
+            console.log('Telegram Web App:', tg);
+            console.log('User data:', user);
+            
+            if (user) {
+                // Обновляем имя пользователя
+                const profileName = document.querySelector('.profile-name');
+                if (profileName) {
+                    profileName.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                }
+
+                // Обновляем аватар пользователя
+                const profileAvatar = document.querySelector('.profile-avatar');
+                if (profileAvatar) {
+                    if (user.photo_url) {
+                        profileAvatar.style.backgroundImage = `url(${user.photo_url})`;
+                        profileAvatar.style.backgroundSize = 'cover';
+                        profileAvatar.style.backgroundPosition = 'center';
+                        profileAvatar.textContent = '';
+                    } else {
+                        profileAvatar.textContent = user.first_name.charAt(0).toUpperCase();
+                        profileAvatar.style.backgroundColor = '#0088cc';
+                        profileAvatar.style.color = 'white';
+                        profileAvatar.style.display = 'flex';
+                        profileAvatar.style.alignItems = 'center';
+                        profileAvatar.style.justifyContent = 'center';
+                        profileAvatar.style.fontSize = '24px';
+                    }
+                }
+            }
+            
             // Показываем основной контент
             document.querySelector('.app-container').style.display = 'block';
             

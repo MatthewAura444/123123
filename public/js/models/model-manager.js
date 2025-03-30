@@ -8,104 +8,168 @@ const loadingPromises = new Map();
 
 class ModelManager {
     constructor() {
-        this.cache = modelCache;
-        this.loadingPromises = loadingPromises;
-        this.textureLoader = new THREE.TextureLoader();
-        this.gltfLoader = new GLTFLoader();
-        
-        // Настройка DRACO декомпрессора для оптимизации
-        const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath('/draco/');
-        this.gltfLoader.setDRACOLoader(dracoLoader);
+        this.models = new Map();
+        this.textures = new Map();
+        this.loadingPromises = new Map();
+        this.init();
     }
 
-    // Загрузка модели с кэшированием
-    async loadModel(giftId, modelUrl, textureUrl) {
-        // Проверяем кэш
-        if (this.cache.has(giftId)) {
-            return this.cache.get(giftId);
-        }
-
-        // Проверяем, не загружается ли уже модель
-        if (this.loadingPromises.has(giftId)) {
-            return this.loadingPromises.get(giftId);
-        }
-
-        // Создаем промис для загрузки
-        const loadPromise = this._loadModelWithProgress(giftId, modelUrl, textureUrl);
-        this.loadingPromises.set(giftId, loadPromise);
-
+    async init() {
         try {
-            const model = await loadPromise;
-            this.cache.set(giftId, model);
-            return model;
-        } finally {
-            this.loadingPromises.delete(giftId);
+            // Проверяем поддержку WebGL
+            if (!this.checkWebGLSupport()) {
+                console.warn('WebGL не поддерживается');
+                return;
+            }
+
+            // Инициализируем Three.js
+            this.scene = new THREE.Scene();
+            this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            this.renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Добавляем освещение
+            this.addLighting();
+
+            // Добавляем обработчики событий
+            this.addEventListeners();
+        } catch (error) {
+            console.error('Ошибка инициализации ModelManager:', error);
         }
     }
 
-    // Загрузка модели с отображением прогресса
-    async _loadModelWithProgress(giftId, modelUrl, textureUrl) {
-        const loadingIndicator = document.querySelector('.model-loading-indicator');
-        const progressBar = document.createElement('div');
-        progressBar.className = 'progress-bar';
-        loadingIndicator.appendChild(progressBar);
-
+    checkWebGLSupport() {
         try {
-            // Загружаем текстуру
-            const texture = await this._loadTexture(textureUrl);
-            
-            // Загружаем модель
-            const model = await this._loadModel(modelUrl, (progress) => {
-                progressBar.style.width = `${progress * 100}%`;
+            const canvas = document.createElement('canvas');
+            return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        } catch (e) {
+            return false;
+        }
+    }
+
+    addLighting() {
+        // Основное освещение
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        this.scene.add(ambientLight);
+
+        // Направленное освещение
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 5, 5);
+        this.scene.add(directionalLight);
+
+        // Точечное освещение
+        const pointLight = new THREE.PointLight(0xffffff, 0.5);
+        pointLight.position.set(-5, -5, -5);
+        this.scene.add(pointLight);
+    }
+
+    addEventListeners() {
+        // Обработка изменения размера окна
+        window.addEventListener('resize', () => {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Обработка движения мыши
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        document.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMousePosition = {
+                x: e.clientX,
+                y: e.clientY
+            };
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const deltaMove = {
+                x: e.clientX - previousMousePosition.x,
+                y: e.clientY - previousMousePosition.y
+            };
+
+            this.rotateModel(deltaMove);
+
+            previousMousePosition = {
+                x: e.clientX,
+                y: e.clientY
+            };
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Обработка колесика мыши для зума
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            this.zoomModel(e.deltaY);
+        });
+    }
+
+    async loadModel(id, modelUrl, textureUrl) {
+        try {
+            // Проверяем, загружена ли уже модель
+            if (this.models.has(id)) {
+                return this.models.get(id);
+            }
+
+            // Проверяем, есть ли уже загрузка в процессе
+            if (this.loadingPromises.has(id)) {
+                return this.loadingPromises.get(id);
+            }
+
+            // Создаем промис для загрузки
+            const loadPromise = new Promise(async (resolve, reject) => {
+                try {
+                    // Загружаем текстуру
+                    const texture = await this.loadTexture(textureUrl);
+                    this.textures.set(id, texture);
+
+                    // Загружаем модель
+                    const loader = new THREE.GLTFLoader();
+                    const gltf = await loader.loadAsync(modelUrl);
+
+                    // Применяем текстуру к модели
+                    this.applyTextureToModel(gltf.scene, texture);
+
+                    // Сохраняем модель
+                    this.models.set(id, gltf.scene);
+
+                    resolve(gltf.scene);
+                } catch (error) {
+                    reject(error);
+                } finally {
+                    this.loadingPromises.delete(id);
+                }
             });
 
-            // Применяем текстуру к модели
-            this._applyTexture(model, texture);
+            this.loadingPromises.set(id, loadPromise);
 
-            return model;
-        } finally {
-            loadingIndicator.removeChild(progressBar);
+            return loadPromise;
+        } catch (error) {
+            console.error(`Ошибка загрузки модели ${id}:`, error);
+            throw error;
         }
     }
 
-    // Загрузка текстуры
-    async _loadTexture(url) {
-        return new Promise((resolve, reject) => {
-            this.textureLoader.load(
-                url,
-                (texture) => {
-                    // Оптимизируем текстуру
-                    texture.minFilter = THREE.LinearFilter;
-                    texture.magFilter = THREE.LinearFilter;
-                    texture.generateMipmaps = false;
-                    resolve(texture);
-                },
-                undefined,
-                reject
-            );
-        });
+    async loadTexture(url) {
+        try {
+            const textureLoader = new THREE.TextureLoader();
+            const texture = await textureLoader.loadAsync(url);
+            texture.needsUpdate = true;
+            return texture;
+        } catch (error) {
+            console.error('Ошибка загрузки текстуры:', error);
+            throw error;
+        }
     }
 
-    // Загрузка модели с отслеживанием прогресса
-    async _loadModel(url, onProgress) {
-        return new Promise((resolve, reject) => {
-            this.gltfLoader.load(
-                url,
-                (gltf) => {
-                    resolve(gltf.scene);
-                },
-                (progress) => {
-                    const percent = progress.loaded / progress.total;
-                    onProgress(percent);
-                },
-                reject
-            );
-        });
-    }
-
-    // Применение текстуры к модели
-    _applyTexture(model, texture) {
+    applyTextureToModel(model, texture) {
         model.traverse((child) => {
             if (child.isMesh) {
                 child.material.map = texture;
@@ -114,36 +178,82 @@ class ModelManager {
         });
     }
 
-    // Получение модели из кэша
-    getModel(giftId) {
-        return this.cache.get(giftId);
+    rotateModel(deltaMove) {
+        const model = this.getCurrentModel();
+        if (!model) return;
+
+        const rotationSpeed = 0.005;
+        model.rotation.y += deltaMove.x * rotationSpeed;
+        model.rotation.x += deltaMove.y * rotationSpeed;
     }
 
-    // Удаление модели из кэша
-    disposeModel(giftId) {
-        const model = this.cache.get(giftId);
+    zoomModel(delta) {
+        const model = this.getCurrentModel();
+        if (!model) return;
+
+        const zoomSpeed = 0.001;
+        const scale = 1 + delta * zoomSpeed;
+        model.scale.multiplyScalar(scale);
+    }
+
+    getCurrentModel() {
+        // Возвращаем текущую активную модель
+        return this.models.values().next().value;
+    }
+
+    render() {
+        requestAnimationFrame(() => this.render());
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    setCameraPosition(position) {
+        this.camera.position.set(position.x, position.y, position.z);
+        this.camera.lookAt(0, 0, 0);
+    }
+
+    setModelPosition(id, position) {
+        const model = this.models.get(id);
         if (model) {
-            // Очищаем геометрию
+            model.position.set(position.x, position.y, position.z);
+        }
+    }
+
+    setModelRotation(id, rotation) {
+        const model = this.models.get(id);
+        if (model) {
+            model.rotation.set(rotation.x, rotation.y, rotation.z);
+        }
+    }
+
+    setModelScale(id, scale) {
+        const model = this.models.get(id);
+        if (model) {
+            model.scale.set(scale.x, scale.y, scale.z);
+        }
+    }
+
+    dispose() {
+        // Очищаем все ресурсы
+        this.models.forEach(model => {
             model.traverse((child) => {
                 if (child.isMesh) {
                     child.geometry.dispose();
                     child.material.dispose();
                 }
             });
-            
-            // Удаляем модель из кэша
-            this.cache.delete(giftId);
-        }
-    }
+        });
 
-    // Очистка всего кэша
-    disposeAll() {
-        for (const [giftId] of this.cache) {
-            this.disposeModel(giftId);
-        }
+        this.textures.forEach(texture => {
+            texture.dispose();
+        });
+
+        this.models.clear();
+        this.textures.clear();
+        this.loadingPromises.clear();
+
+        this.renderer.dispose();
     }
 }
 
-// Создаем и экспортируем единственный экземпляр менеджера
-const modelManager = new ModelManager();
-export default modelManager; 
+// Создаем глобальный экземпляр
+window.modelManager = new ModelManager(); 

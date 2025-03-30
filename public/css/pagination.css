@@ -1,0 +1,105 @@
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 24px 0;
+}
+
+.pagination-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.pagination-button.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.pagination-ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* Анимации */
+.pagination-button {
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: slideIn 0.3s ease forwards;
+}
+
+.pagination-button:nth-child(1) { animation-delay: 0.1s; }
+.pagination-button:nth-child(2) { animation-delay: 0.2s; }
+.pagination-button:nth-child(3) { animation-delay: 0.3s; }
+.pagination-button:nth-child(4) { animation-delay: 0.4s; }
+.pagination-button:nth-child(5) { animation-delay: 0.5s; }
+.pagination-button:nth-child(6) { animation-delay: 0.6s; }
+.pagination-button:nth-child(7) { animation-delay: 0.7s; }
+.pagination-button:nth-child(8) { animation-delay: 0.8s; }
+.pagination-button:nth-child(9) { animation-delay: 0.9s; }
+.pagination-button:nth-child(10) { animation-delay: 1s; }
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .pagination-container {
+        margin: 16px 0;
+        gap: 4px;
+    }
+
+    .pagination-button {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+        font-size: 12px;
+    }
+
+    .pagination-button svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .pagination-ellipsis {
+        min-width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+} 

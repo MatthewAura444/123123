@@ -8,15 +8,22 @@
     <title>TelegramGift</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="collections.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --tg-theme-bg-color: #1f2937;
+            --tg-theme-bg-color: #0F0F0F;
             --tg-theme-text-color: #ffffff;
-            --tg-theme-hint-color: #9ca3af;
-            --tg-theme-link-color: #3b82f6;
-            --tg-theme-button-color: #3b82f6;
+            --tg-theme-hint-color: #8E8E93;
+            --tg-theme-link-color: #2AABEE;
+            --tg-theme-button-color: #2AABEE;
             --tg-theme-button-text-color: #ffffff;
-            --tg-theme-secondary-bg-color: #374151;
+            --tg-theme-secondary-bg-color: #1C1C1E;
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --gradient-primary: linear-gradient(135deg, #2AABEE 0%, #229ED9 100%);
+            --gradient-secondary: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 100%);
+            --gradient-accent: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+            --blur-bg: rgba(28, 28, 30, 0.85);
+            --glass-effect: rgba(255, 255, 255, 0.05);
         }
 
         * {
@@ -27,108 +34,170 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--tg-theme-bg-color);
             color: var(--tg-theme-text-color);
             line-height: 1.5;
             padding: 0;
             margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .app-container {
             max-width: 100%;
             margin: 0 auto;
-            padding: 16px;
+            padding: 20px;
         }
 
         .header {
-            margin-bottom: 24px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
         }
 
         .header h1 {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--tg-theme-text-color);
+            font-size: 34px;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 40px;
+            height: 4px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
         }
 
         .nav-tabs {
             display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            background: var(--tg-theme-secondary-bg-color);
+            gap: 8px;
+            margin-bottom: 32px;
+            background: var(--glass-effect);
             padding: 8px;
-            border-radius: 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .nav-tab {
-            padding: 12px 24px;
-            border-radius: 8px;
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: 16px;
             color: var(--tg-theme-hint-color);
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            text-align: center;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
         }
 
         .nav-tab.active {
-            background: var(--tg-theme-button-color);
             color: var(--tg-theme-button-text-color);
+            box-shadow: 0 4px 20px rgba(42, 171, 238, 0.3);
         }
 
-        .tab-content {
-            display: none;
+        .nav-tab.active::before {
+            opacity: 1;
         }
 
-        .tab-content.active {
-            display: block;
+        .nav-tab span {
+            position: relative;
+            z-index: 1;
         }
 
         .market-stats {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 32px;
         }
 
         .stat-card {
-            flex: 1;
-            background: var(--tg-theme-secondary-bg-color);
-            padding: 16px;
-            border-radius: 12px;
+            background: var(--glass-effect);
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
         .stat-value {
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 32px;
+            font-weight: 800;
             color: var(--tg-theme-text-color);
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: 16px;
             color: var(--tg-theme-hint-color);
+            font-weight: 500;
         }
 
         .gifts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 24px;
         }
 
         .gift-card {
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 12px;
+            background: var(--glass-effect);
+            border-radius: 24px;
             overflow: hidden;
-            transition: transform 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .gift-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
         }
 
         .gift-image {
             width: 100%;
             padding-top: 100%;
             position: relative;
-            background: rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         .gift-image img {
@@ -138,64 +207,254 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gift-card:hover .gift-image img {
+            transform: scale(1.15);
         }
 
         .gift-info {
-            padding: 12px;
+            padding: 20px;
+            background: var(--blur-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
         .gift-name {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             color: var(--tg-theme-text-color);
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
         }
 
         .gift-model {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--tg-theme-hint-color);
-            margin-bottom: 8px;
+            margin-bottom: 16px;
+            font-weight: 500;
         }
 
         .gift-price {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--tg-theme-link-color);
+            font-size: 20px;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 8px;
+            letter-spacing: -0.5px;
         }
 
-        .gift-price svg {
-            width: 16px;
-            height: 16px;
+        .gift-price::before {
+            content: '₽';
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .nav-tab {
+                padding: 12px 20px;
+                font-size: 15px;
+            }
+
+            .stat-value {
+                font-size: 28px;
+            }
+
+            .gifts-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 16px;
+            }
         }
 
         .create-gift-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
             padding: 16px;
-            background: var(--tg-theme-button-color);
+            background: var(--gradient-primary);
             color: var(--tg-theme-button-text-color);
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 16px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 24px;
-            transition: opacity 0.3s ease;
+            margin-top: 32px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(3, 126, 229, 0.3);
         }
 
         .create-gift-btn:hover {
-            opacity: 0.9;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(3, 126, 229, 0.4);
         }
 
         .create-gift-btn svg {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
+        }
+
+        .profile-container {
+            background: var(--gradient-secondary);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .connect-wallet-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-primary);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(3, 126, 229, 0.3);
+        }
+
+        .connect-wallet-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(3, 126, 229, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--gradient-secondary);
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--tg-theme-hint-color);
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .price-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .price-input-container input,
+        .price-input-container textarea {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            background: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .price-input-container textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-primary);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(3, 126, 229, 0.3);
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(3, 126, 229, 0.4);
         }
     </style>
 </head>

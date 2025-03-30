@@ -466,4 +466,311 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('popstate', () => {
         pageTransition.navigateBack();
     });
-}); 
+});
+
+class GiftsManager {
+    constructor() {
+        this.giftsContainer = document.getElementById('giftsContainer');
+        this.currentUser = null;
+        this.gifts = [];
+        this.filters = {
+            sort: 'newest',
+            price: { min: 0, max: null },
+            category: null,
+            search: ''
+        };
+        this.init();
+    }
+
+    async init() {
+        try {
+            // Получаем данные пользователя из Telegram Web App
+            const tg = window.Telegram.WebApp;
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                this.currentUser = tg.initDataUnsafe.user;
+                await this.loadGifts();
+            }
+
+            // Подписываемся на WebSocket события
+            window.wsClient.on('giftAdded', this.handleNewGift.bind(this));
+            window.wsClient.on('giftSold', this.handleGiftSold.bind(this));
+            window.wsClient.on('giftUpdated', this.handleGiftUpdate.bind(this));
+            window.wsClient.on('giftDeleted', this.handleGiftDelete.bind(this));
+
+            // Инициализируем фильтры
+            this.initializeFilters();
+        } catch (error) {
+            console.error('Ошибка инициализации GiftsManager:', error);
+        }
+    }
+
+    async loadGifts() {
+        try {
+            const gifts = await window.api.getGifts(this.filters);
+            this.gifts = gifts;
+            this.renderGifts();
+        } catch (error) {
+            console.error('Ошибка загрузки подарков:', error);
+            window.Telegram.WebApp.showAlert('Ошибка загрузки подарков');
+        }
+    }
+
+    renderGifts() {
+        if (!this.giftsContainer) return;
+
+        this.giftsContainer.innerHTML = this.gifts.map(gift => `
+            <div class="gift-card" data-id="${gift._id}">
+                <div class="gift-image">
+                    <img src="${gift.imageUrl}" alt="${gift.name}">
+                    <div class="gift-overlay">
+                        ${this.currentUser && gift.creator === this.currentUser.id ? `
+                            <button class="edit-gift-btn" onclick="giftsManager.editGift('${gift._id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                            </button>
+                            <button class="delete-gift-btn" onclick="giftsManager.deleteGift('${gift._id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+                        <button class="favorite-gift-btn" onclick="giftsManager.toggleFavorite('${gift._id}')">
+                            <svg viewBox="0 0 24 24" fill="${gift.likes?.includes(this.currentUser?.id) ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="gift-info">
+                    <h3 class="gift-name">${gift.name}</h3>
+                    <p class="gift-description">${gift.description || 'Нет описания'}</p>
+                    <div class="gift-meta">
+                        <span class="gift-category">${gift.category || 'Без категории'}</span>
+                        <span class="gift-views">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            ${gift.views || 0}
+                        </span>
+                    </div>
+                    <div class="gift-price">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        ${gift.price} ${gift.currency}
+                    </div>
+                    ${gift.status === 'available' ? `
+                        <button class="buy-gift-btn" onclick="giftsManager.buyGift('${gift._id}')">
+                            Купить
+                        </button>
+                    ` : `
+                        <div class="gift-status ${gift.status}">
+                            ${gift.status === 'sold' ? 'Продано' : 'Забронировано'}
+                        </div>
+                    `}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async createGift(data) {
+        try {
+            const gift = await window.api.createGift({
+                ...data,
+                creator: this.currentUser.id
+            });
+            
+            this.gifts.unshift(gift);
+            this.renderGifts();
+            
+            // Отправляем уведомление через WebSocket
+            window.wsClient.send({
+                type: 'NEW_GIFT',
+                gift
+            });
+
+            window.Telegram.WebApp.showAlert('Подарок успешно создан!');
+            return gift;
+        } catch (error) {
+            console.error('Ошибка создания подарка:', error);
+            window.Telegram.WebApp.showAlert('Ошибка создания подарка');
+            throw error;
+        }
+    }
+
+    async editGift(id) {
+        try {
+            const gift = this.gifts.find(g => g._id === id);
+            if (!gift) return;
+
+            // Показываем модальное окно редактирования
+            const modal = document.getElementById('editGiftModal');
+            if (modal) {
+                document.getElementById('editGiftName').value = gift.name;
+                document.getElementById('editGiftDescription').value = gift.description || '';
+                document.getElementById('editGiftPrice').value = gift.price;
+                document.getElementById('editGiftCategory').value = gift.category || '';
+                modal.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Ошибка редактирования подарка:', error);
+            window.Telegram.WebApp.showAlert('Ошибка редактирования подарка');
+        }
+    }
+
+    async updateGift(id, data) {
+        try {
+            const updatedGift = await window.api.updateGift(id, data);
+            const index = this.gifts.findIndex(g => g._id === id);
+            if (index !== -1) {
+                this.gifts[index] = updatedGift;
+                this.renderGifts();
+            }
+
+            // Отправляем уведомление через WebSocket
+            window.wsClient.send({
+                type: 'GIFT_UPDATE',
+                gift: updatedGift
+            });
+
+            window.Telegram.WebApp.showAlert('Подарок успешно обновлен!');
+            return updatedGift;
+        } catch (error) {
+            console.error('Ошибка обновления подарка:', error);
+            window.Telegram.WebApp.showAlert('Ошибка обновления подарка');
+            throw error;
+        }
+    }
+
+    async deleteGift(id) {
+        try {
+            if (await window.Telegram.WebApp.showConfirm('Вы уверены, что хотите удалить этот подарок?')) {
+                await window.api.deleteGift(id);
+                this.gifts = this.gifts.filter(g => g._id !== id);
+                this.renderGifts();
+
+                // Отправляем уведомление через WebSocket
+                window.wsClient.send({
+                    type: 'GIFT_DELETE',
+                    giftId: id
+                });
+
+                window.Telegram.WebApp.showAlert('Подарок успешно удален!');
+            }
+        } catch (error) {
+            console.error('Ошибка удаления подарка:', error);
+            window.Telegram.WebApp.showAlert('Ошибка удаления подарка');
+        }
+    }
+
+    async buyGift(id) {
+        try {
+            const gift = this.gifts.find(g => g._id === id);
+            if (!gift) return;
+
+            // Проверяем подключение кошелька
+            if (!window.tonConnect.isConnected()) {
+                await window.tonConnect.connect();
+            }
+
+            // Создаем транзакцию
+            const transaction = await window.api.createTransaction({
+                gift: id,
+                seller: gift.creator,
+                buyer: this.currentUser.id,
+                amount: gift.price,
+                currency: gift.currency,
+                paymentMethod: 'TON_WALLET'
+            });
+
+            // Отправляем транзакцию через TON Connect
+            const result = await window.tonConnect.sendTransaction({
+                validUntil: Date.now() + 5 * 60 * 1000, // 5 минут
+                messages: [
+                    {
+                        address: gift.creator,
+                        amount: gift.price * 1000000000 // Конвертируем в нано TON
+                    }
+                ]
+            });
+
+            // Обновляем статус транзакции
+            await window.api.updateTransaction(transaction._id, {
+                status: 'completed',
+                transactionHash: result.hash
+            });
+
+            // Обновляем статус подарка
+            await this.updateGift(id, { status: 'sold' });
+
+            window.Telegram.WebApp.showAlert('Подарок успешно куплен!');
+        } catch (error) {
+            console.error('Ошибка покупки подарка:', error);
+            window.Telegram.WebApp.showAlert('Ошибка покупки подарка');
+        }
+    }
+
+    async toggleFavorite(id) {
+        try {
+            const gift = this.gifts.find(g => g._id === id);
+            if (!gift) return;
+
+            if (gift.likes?.includes(this.currentUser.id)) {
+                await window.api.removeFromFavorites(id);
+                gift.likes = gift.likes.filter(userId => userId !== this.currentUser.id);
+            } else {
+                await window.api.addToFavorites(id);
+                if (!gift.likes) gift.likes = [];
+                gift.likes.push(this.currentUser.id);
+            }
+
+            this.renderGifts();
+        } catch (error) {
+            console.error('Ошибка обновления избранного:', error);
+            window.Telegram.WebApp.showAlert('Ошибка обновления избранного');
+        }
+    }
+
+    initializeFilters() {
+        // Добавляем обработчики для фильтров
+        const filterElements = document.querySelectorAll('.filter-input');
+        filterElements.forEach(element => {
+            element.addEventListener('change', (e) => {
+                this.filters[e.target.name] = e.target.value;
+                this.loadGifts();
+            });
+        });
+    }
+
+    handleNewGift(gift) {
+        this.gifts.unshift(gift);
+        this.renderGifts();
+    }
+
+    handleGiftSold(giftId) {
+        const gift = this.gifts.find(g => g._id === giftId);
+        if (gift) {
+            gift.status = 'sold';
+            this.renderGifts();
+        }
+    }
+
+    handleGiftUpdate(gift) {
+        const index = this.gifts.findIndex(g => g._id === gift._id);
+        if (index !== -1) {
+            this.gifts[index] = gift;
+            this.renderGifts();
+        }
+    }
+
+    handleGiftDelete(giftId) {
+        this.gifts = this.gifts.filter(g => g._id !== giftId);
+        this.renderGifts();
+    }
+}
+
+// Создаем глобальный экземпляр
+window.giftsManager = new GiftsManager(); 

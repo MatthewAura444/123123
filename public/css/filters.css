@@ -1,0 +1,291 @@
+.filters-container {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.filters-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.filter-counter {
+    background: var(--primary-color);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+    display: none;
+}
+
+.filters-section {
+    margin-bottom: 24px;
+}
+
+.filters-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 12px;
+}
+
+/* Ценовой диапазон */
+.price-range {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.price-input-group {
+    flex: 1;
+}
+
+.price-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.price-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.price-separator {
+    color: var(--text-secondary);
+}
+
+/* Категории */
+.categories-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+}
+
+.category-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.category-checkbox-wrapper:hover {
+    border-color: var(--primary-color);
+}
+
+.category-checkbox {
+    display: none;
+}
+
+.category-checkbox:checked + .category-checkbox-wrapper {
+    background: var(--primary-color-alpha);
+    border-color: var(--primary-color);
+}
+
+.category-label {
+    font-size: 14px;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+/* Рейтинг */
+.rating-input {
+    width: 100%;
+    height: 4px;
+    -webkit-appearance: none;
+    background: var(--border-color);
+    border-radius: 2px;
+    outline: none;
+}
+
+.rating-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.rating-input::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+.rating-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* Сортировка */
+.sort-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sort-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.sort-select option {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Активные фильтры */
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.active-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--primary-color-alpha);
+    border: 1px solid var(--primary-color);
+    border-radius: 16px;
+    font-size: 14px;
+    color: var(--primary-color);
+}
+
+.filter-label {
+    white-space: nowrap;
+}
+
+.remove-filter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.remove-filter:hover {
+    transform: scale(1.1);
+}
+
+.remove-filter svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Кнопка сброса */
+.reset-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reset-filters:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.reset-filters svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Анимации */
+.filters-container {
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .filters-container {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .filters-title {
+        font-size: 16px;
+    }
+
+    .categories-list {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .category-checkbox-wrapper {
+        padding: 6px 10px;
+    }
+
+    .category-label {
+        font-size: 12px;
+    }
+
+    .active-filter {
+        padding: 4px 10px;
+        font-size: 12px;
+    }
+
+    .reset-filters {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+} 

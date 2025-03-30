@@ -7,8 +7,11 @@ const WebSocket = require('ws');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
 
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 const port = process.env.PORT || 3000;
 
 // Подключение к MongoDB
@@ -61,7 +64,7 @@ bot.command('gifts', async (ctx) => {
             await ctx.reply('У вас пока нет подарков. Используйте /create для создания нового подарка.');
             return;
         }
-
+        
         const message = listings.map(listing => 
             `🎁 ${listing.name}\n` +
             `💰 Цена: ${listing.price} TON\n` +
@@ -100,7 +103,7 @@ bot.command('market', async (ctx) => {
             await ctx.reply('В маркете пока нет подарков.');
             return;
         }
-
+            
         const message = '🔥 Топ подарков в маркете:\n\n' + 
             listings.map(listing => 
                 `🎁 ${listing.name}\n` +
@@ -171,7 +174,97 @@ app.get('/api/listings', async (req, res) => {
     }
 });
 
+// WebSocket connections
+const clients = new Map();
+
+wss.on('connection', (ws, req) => {
+    const userId = req.url.split('?userId=')[1];
+    clients.set(userId, ws);
+
+    ws.on('message', async (message) => {
+        const data = JSON.parse(message);
+        // Handle different message types
+        switch (data.type) {
+            case 'NEW_GIFT':
+                broadcastToAll({ type: 'GIFT_ADDED', gift: data.gift });
+                break;
+            case 'GIFT_SOLD':
+                broadcastToAll({ type: 'GIFT_SOLD', giftId: data.giftId });
+                break;
+            case 'NEW_COLLECTION':
+                broadcastToAll({ type: 'COLLECTION_ADDED', collection: data.collection });
+                break;
+        }
+    });
+
+    ws.on('close', () => {
+        clients.delete(userId);
+    });
+});
+
+function broadcastToAll(data) {
+    clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(data));
+        }
+    });
+}
+
+// API Routes
+app.get('/api/gifts', async (req, res) => {
+    try {
+        const gifts = await Listing.find().sort({ createdAt: -1 });
+        res.json(gifts);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/collections', async (req, res) => {
+    try {
+        const collections = await Listing.find().populate('userId');
+        res.json(collections);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/gifts', async (req, res) => {
+    try {
+        const gift = new Listing(req.body);
+        await gift.save();
+        res.status(201).json(gift);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+app.post('/api/collections', async (req, res) => {
+    try {
+        const collection = new Listing(req.body);
+        await collection.save();
+        res.status(201).json(collection);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+app.post('/api/transactions', async (req, res) => {
+    try {
+        const transaction = new Listing(req.body);
+        await transaction.save();
+        res.status(201).json(transaction);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Serve static files
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'public', 'telegram-app.html'));
+});
+
 // Запуск сервера
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 }); 

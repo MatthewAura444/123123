@@ -1,0 +1,240 @@
+.create-gift-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--surface-color);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.create-gift-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.create-gift-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.create-gift-header p {
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.create-gift-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: var(--text-primary);
+    background: var(--input-bg);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color-light);
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.5rem;
+    padding-right: 2.5rem;
+}
+
+.price-group {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+}
+
+.image-upload,
+.model-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.image-preview,
+.model-preview {
+    width: 100%;
+    height: 200px;
+    border: 2px dashed var(--border-color);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.image-preview:not(.has-image):hover,
+.model-preview:not(.has-model):hover {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color-light);
+}
+
+.image-preview svg,
+.model-preview svg {
+    width: 48px;
+    height: 48px;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.image-preview.has-image svg,
+.model-preview.has-model svg {
+    display: none;
+}
+
+.model-name {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-align: center;
+    word-break: break-all;
+    padding: 0 1rem;
+}
+
+.image-upload input[type="file"],
+.model-upload input[type="file"] {
+    display: none;
+}
+
+.image-upload .upload-hint,
+.model-upload .upload-hint {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.form-actions .btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.form-actions .btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.error-message {
+    font-size: 0.875rem;
+    color: var(--danger-color);
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .create-gift-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .create-gift-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .price-group {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .create-gift-container {
+        background: var(--surface-color-dark);
+    }
+
+    .create-gift-header h1 {
+        color: var(--text-primary-dark);
+    }
+
+    .create-gift-header p {
+        color: var(--text-muted-dark);
+    }
+
+    .form-group label {
+        color: var(--text-primary-dark);
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        color: var(--text-primary-dark);
+        background: var(--input-bg-dark);
+        border-color: var(--border-color-dark);
+    }
+
+    .image-preview,
+    .model-preview {
+        border-color: var(--border-color-dark);
+    }
+
+    .image-preview:not(.has-image):hover,
+    .model-preview:not(.has-model):hover {
+        background-color: var(--primary-color-dark);
+    }
+
+    .image-preview svg,
+    .model-preview svg {
+        color: var(--text-muted-dark);
+    }
+
+    .model-name {
+        color: var(--text-muted-dark);
+    }
+
+    .image-upload .upload-hint,
+    .model-upload .upload-hint {
+        color: var(--text-muted-dark);
+    }
+} 

@@ -1,0 +1,233 @@
+/* Основные стили кнопок */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Типы кнопок */
+.btn-primary {
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+
+.btn-secondary {
+    color: var(--color-text);
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-secondary-dark);
+    border-color: var(--color-secondary-dark);
+}
+
+.btn-success {
+    color: var(--color-white);
+    background-color: var(--color-success);
+    border-color: var(--color-success);
+}
+
+.btn-success:hover {
+    background-color: var(--color-success-dark);
+    border-color: var(--color-success-dark);
+}
+
+.btn-danger {
+    color: var(--color-white);
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+.btn-danger:hover {
+    background-color: var(--color-danger-dark);
+    border-color: var(--color-danger-dark);
+}
+
+.btn-warning {
+    color: var(--color-text);
+    background-color: var(--color-warning);
+    border-color: var(--color-warning);
+}
+
+.btn-warning:hover {
+    background-color: var(--color-warning-dark);
+    border-color: var(--color-warning-dark);
+}
+
+.btn-info {
+    color: var(--color-white);
+    background-color: var(--color-info);
+    border-color: var(--color-info);
+}
+
+.btn-info:hover {
+    background-color: var(--color-info-dark);
+    border-color: var(--color-info-dark);
+}
+
+.btn-link {
+    color: var(--color-primary);
+    background-color: transparent;
+    border-color: transparent;
+    padding: 0.5rem 1rem;
+}
+
+.btn-link:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+}
+
+/* Состояния кнопок */
+.btn-default {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-pressed {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-loading {
+    color: transparent !important;
+    position: relative;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid var(--color-white);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: button-spinner 0.6s linear infinite;
+}
+
+.btn-disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Размеры кнопок */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+}
+
+/* Кнопки с иконками */
+.btn-icon {
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.btn-icon i {
+    font-size: 1.25rem;
+}
+
+/* Кнопки с текстом и иконкой */
+.btn-text-icon {
+    gap: 0.5rem;
+}
+
+.btn-text-icon i {
+    font-size: 1.25rem;
+}
+
+/* Анимации */
+@keyframes button-spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Эффект пульсации */
+.btn-pulse {
+    animation: button-pulse 2s infinite;
+}
+
+@keyframes button-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(var(--color-primary-rgb), 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .btn-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .btn-text-icon {
+        gap: 0.25rem;
+    }
+}
+
+/* Темная тема */
+@media (prefers-color-scheme: dark) {
+    .btn-secondary {
+        color: var(--color-white);
+        background-color: var(--color-secondary-dark);
+        border-color: var(--color-secondary-dark);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-secondary);
+        border-color: var(--color-secondary);
+    }
+
+    .btn-warning {
+        color: var(--color-white);
+    }
+} 

@@ -1207,7 +1207,100 @@
         }
 
         .form-group input[type="file"] {
-            padding: 8px;
+            display: none;
+        }
+
+        .form-group .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background: var(--glass-bg);
+            border: 2px dashed var(--tg-theme-button-color);
+            border-radius: 12px;
+            color: var(--tg-theme-text-color);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-group .file-input-label:hover {
+            border-color: var(--tg-theme-button-text-color);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group .file-input-label:active {
+            transform: translateY(1px);
+        }
+
+        .form-group .file-input-label svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--tg-theme-button-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-group .file-input-label:hover svg {
+            stroke: var(--tg-theme-button-text-color);
+            transform: scale(1.1);
+        }
+
+        .form-group .file-input-label span {
+            font-weight: 600;
+        }
+
+        .form-group .file-preview {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .form-group .file-preview img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--tg-theme-button-color);
+        }
+
+        .form-group .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .form-group .selected-files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .form-group .selected-file {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            font-size: 14px;
+            color: var(--tg-theme-text-color);
+        }
+
+        .form-group .selected-file .remove-file {
+            cursor: pointer;
+            color: var(--tg-theme-hint-color);
+            transition: color 0.3s ease;
+        }
+
+        .form-group .selected-file .remove-file:hover {
+            color: var(--tg-theme-destructive-text-color);
         }
 
         .submit-btn {
@@ -1426,15 +1519,42 @@
                         </div>
                         <div class="form-group">
                             <label>Background</label>
-                            <input type="file" name="background" accept="image/*">
+                            <label class="file-input-label" for="background">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                    <path d="M17 8l-5-5-5 5"/>
+                                    <path d="M12 3v12"/>
+                                </svg>
+                                <span>Choose background image</span>
+                            </label>
+                            <input type="file" id="background" name="background" accept="image/*">
+                            <div class="file-preview" id="background-preview"></div>
                         </div>
                         <div class="form-group">
                             <label>Pattern</label>
-                            <input type="file" name="pattern" accept="image/*">
+                            <label class="file-input-label" for="pattern">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                    <path d="M17 8l-5-5-5 5"/>
+                                    <path d="M12 3v12"/>
+                                </svg>
+                                <span>Choose pattern image</span>
+                            </label>
+                            <input type="file" id="pattern" name="pattern" accept="image/*">
+                            <div class="file-preview" id="pattern-preview"></div>
                         </div>
                         <div class="form-group">
                             <label>Gift Photos</label>
-                            <input type="file" name="giftPhotos" accept="image/*" multiple>
+                            <label class="file-input-label" for="giftPhotos">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                    <path d="M17 8l-5-5-5 5"/>
+                                    <path d="M12 3v12"/>
+                                </svg>
+                                <span>Choose gift photos</span>
+                            </label>
+                            <input type="file" id="giftPhotos" name="giftPhotos" accept="image/*" multiple>
+                            <div class="file-preview" id="photos-preview"></div>
                         </div>
                         <div class="form-group">
                             <label>Price (TON)</label>
@@ -1637,6 +1757,47 @@
             if (connectedWallet) {
                 const walletData = JSON.parse(connectedWallet);
                 updateWalletUI(walletData.address);
+            }
+
+            // Добавляем обработчики для предпросмотра файлов
+            document.getElementById('background').addEventListener('change', function(e) {
+                handleFileSelect(e, 'background-preview');
+            });
+
+            document.getElementById('pattern').addEventListener('change', function(e) {
+                handleFileSelect(e, 'pattern-preview');
+            });
+
+            document.getElementById('giftPhotos').addEventListener('change', function(e) {
+                handleFileSelect(e, 'photos-preview');
+            });
+
+            // Функция для обработки выбора файлов
+            function handleFileSelect(event, previewId) {
+                const preview = document.getElementById(previewId);
+                preview.innerHTML = '';
+                
+                const files = event.target.files;
+                for (const file of files) {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            preview.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+
+                // Обновляем текст на кнопке
+                const label = event.target.previousElementSibling;
+                const span = label.querySelector('span');
+                if (files.length > 0) {
+                    span.textContent = files.length > 1 
+                        ? `${files.length} files selected` 
+                        : files[0].name;
+                }
             }
         });
     </script>

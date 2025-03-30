@@ -1519,29 +1519,11 @@
                         </div>
                         <div class="form-group">
                             <label>Background</label>
-                            <label class="file-input-label" for="background">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                                    <path d="M17 8l-5-5-5 5"/>
-                                    <path d="M12 3v12"/>
-                                </svg>
-                                <span>Choose background image</span>
-                            </label>
-                            <input type="file" id="background" name="background" accept="image/*">
-                            <div class="file-preview" id="background-preview"></div>
+                            <input type="text" name="background" placeholder="Enter background color or description" required>
                         </div>
                         <div class="form-group">
                             <label>Pattern</label>
-                            <label class="file-input-label" for="pattern">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                                    <path d="M17 8l-5-5-5 5"/>
-                                    <path d="M12 3v12"/>
-                                </svg>
-                                <span>Choose pattern image</span>
-                            </label>
-                            <input type="file" id="pattern" name="pattern" accept="image/*">
-                            <div class="file-preview" id="pattern-preview"></div>
+                            <input type="text" name="pattern" placeholder="Enter pattern description" required>
                         </div>
                         <div class="form-group">
                             <label>Gift Photos</label>
@@ -1759,15 +1741,7 @@
                 updateWalletUI(walletData.address);
             }
 
-            // Добавляем обработчики для предпросмотра файлов
-            document.getElementById('background').addEventListener('change', function(e) {
-                handleFileSelect(e, 'background-preview');
-            });
-
-            document.getElementById('pattern').addEventListener('change', function(e) {
-                handleFileSelect(e, 'pattern-preview');
-            });
-
+            // Добавляем обработчики для предпросмотра файлов только для Gift Photos
             document.getElementById('giftPhotos').addEventListener('change', function(e) {
                 handleFileSelect(e, 'photos-preview');
             });

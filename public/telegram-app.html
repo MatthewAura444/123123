@@ -1451,60 +1451,49 @@
         // Инициализация Telegram Web App
         let tg = window.Telegram.WebApp;
         
-        // Константы
-        const PLATFORM_FEE_WALLET = 'UQASbk4JxjCjgU6Hj3mdW9iPiF-csOsPBLhLhEYoAQdt8vwY';
-        const PLATFORM_FEE_PERCENT = 2.5;
-
-        // Инициализация TON Connect
-        const connector = new TonConnect({
-            manifestUrl: 'https://matthewaura444.github.io/123123/public/tonconnect-manifest.json'
-        });
+        // Функция для установки активного таба
+        function setActiveTab(tabId) {
+            // Убираем активный класс у всех табов
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Добавляем активный класс выбранному табу
+            const selectedTab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+            
+            // Показываем соответствующий контент
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            const selectedContent = document.getElementById(tabId);
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+        }
 
         // Функция для подключения кошелька
         async function connectWallet(type) {
-            try {
-                if (type === 'telegram') {
-                    // Проверяем, доступен ли Telegram Wallet
-                    if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-                        // Создаем запрос на подключение через Telegram Wallet
-                        const universalLink = 'ton://connect?v=2&r=https://t.me/wallet';
-                        window.Telegram.WebApp.openTelegramLink(universalLink);
-                        
-                        // Ждем подключения
-                        const wallet = await connector.connect({
-                            universalLink: universalLink,
-                            bridgeUrl: 'https://bridge.tonapi.io/bridge'
-                        });
-                        
-                        if (wallet) {
-                            // Получаем адрес кошелька
-                            const walletAddress = wallet.account.address;
-                            
-                            // Обновляем интерфейс
-                            document.getElementById('wallet-status').textContent = `Connected: ${walletAddress}`;
-                            document.getElementById('connect-wallet-btn').style.display = 'none';
-                            
-                            // Сохраняем информацию
-                            localStorage.setItem('walletConnected', 'true');
-                            localStorage.setItem('walletAddress', walletAddress);
-                        }
-                    } else {
-                        alert('Please open this app in Telegram');
-                    }
-                } else {
-                    // Для других кошельков используем стандартный процесс подключения
-                    const wallet = await connector.connect();
-                    if (wallet) {
-                        const walletAddress = wallet.account.address;
-                        document.getElementById('wallet-status').textContent = `Connected: ${walletAddress}`;
-                        document.getElementById('connect-wallet-btn').style.display = 'none';
-                        localStorage.setItem('walletConnected', 'true');
-                        localStorage.setItem('walletAddress', walletAddress);
-                    }
+            if (type === 'telegram') {
+                try {
+                    // Подключаем Telegram Wallet
+                    const wallet = await window.Telegram.WebApp.connectWallet();
+                    console.log('Connected wallet:', wallet);
+                    // Сохраняем информацию о подключенном кошельке
+                    localStorage.setItem('connectedWallet', JSON.stringify({
+                        type: 'telegram',
+                        address: wallet.address
+                    }));
+                    // Обновляем UI
+                    updateWalletUI(wallet.address);
+                } catch (error) {
+                    console.error('Error connecting wallet:', error);
                 }
-            } catch (error) {
-                console.error('Error connecting wallet:', error);
-                alert('Error connecting wallet. Please try again.');
+            } else {
+                // Здесь будет логика для других типов кошельков
+                console.log('Connecting other wallet type:', type);
             }
         }
 
@@ -1520,150 +1509,55 @@
             modal.classList.remove('active');
         }
 
-        // Функция для установки активного таба
-        function setActiveTab(tabId) {
-            // Убираем активный класс у всех табов
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Скрываем все контенты табов
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            // Активируем выбранный таб
-            const selectedTab = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
-            const selectedContent = document.getElementById(`${tabId}-tab`);
-            
-            if (selectedTab && selectedContent) {
-                selectedTab.classList.add('active');
-                selectedContent.style.display = 'block';
-            }
-        }
-
-        // Функция для скрытия модального окна подключения кошелька
-        function hideWalletConnect() {
-            document.getElementById('walletConnectModal').classList.remove('active');
-        }
-
-        // Функция для скрытия модального окна со всеми кошельками
-        function hideAllWallets() {
-            document.getElementById('allWalletsModal').classList.remove('active');
-        }
-
-        // Функция для копирования в буфер обмена
+        // Функция для копирования текста в буфер обмена
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('Link copied to clipboard!');
+                // Показываем уведомление об успешном копировании
+                const notification = document.createElement('div');
+                notification.className = 'copy-notification';
+                notification.textContent = 'Copied!';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
             });
+        }
+
+        // Функция для обновления UI кошелька
+        function updateWalletUI(address) {
+            const walletAddress = document.querySelector('.wallet-address');
+            if (walletAddress) {
+                walletAddress.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+            }
         }
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Инициализация Telegram Web App
+            // Инициализируем Telegram Web App
             tg.ready();
             
-            // Отключаем масштабирование на мобильных устройствах
-            document.addEventListener('touchstart', function(e) {
-                if (e.touches.length > 1) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-
-            // Отключаем двойной тап для масштабирования
-            document.addEventListener('touchend', function(e) {
-                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-
-            // Получаем данные пользователя
-            const user = tg.initDataUnsafe.user;
-            console.log('Telegram Web App:', tg);
-            console.log('User data:', user);
-            
-            if (user) {
-                // Обновляем имя пользователя
-                const profileName = document.querySelector('.profile-name');
-                if (profileName) {
-                    profileName.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-                }
-
-                // Обновляем аватар пользователя
-                const profileAvatar = document.querySelector('.profile-avatar');
-                if (profileAvatar) {
-                    if (user.photo_url) {
-                        profileAvatar.style.backgroundImage = `url(${user.photo_url})`;
-                        profileAvatar.style.backgroundSize = 'cover';
-                        profileAvatar.style.backgroundPosition = 'center';
-                        profileAvatar.textContent = '';
-                    } else {
-                        profileAvatar.textContent = user.first_name.charAt(0).toUpperCase();
-                        profileAvatar.style.backgroundColor = '#0088cc';
-                        profileAvatar.style.color = 'white';
-                        profileAvatar.style.display = 'flex';
-                        profileAvatar.style.alignItems = 'center';
-                        profileAvatar.style.justifyContent = 'center';
-                        profileAvatar.style.fontSize = '24px';
-                    }
-                }
-            }
-
-            // Обновляем цветовую схему
-            const colorScheme = tg.colorScheme;
-            document.documentElement.setAttribute('data-theme', colorScheme);
-
             // Показываем основной контент
-            document.body.style.visibility = 'visible';
-
-            // Добавляем обработчики для табов
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
+            document.querySelector('.main-content').style.display = 'block';
+            
+            // Устанавливаем начальный активный таб
+            setActiveTab('nft');
+            
+            // Обработчики для табов
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
                     setActiveTab(tabId);
                 });
             });
 
             // Обработчик для кнопки подключения кошелька
-            const connectWalletBtn = document.getElementById('connect-wallet-btn');
+            const connectWalletBtn = document.querySelector('.connect-wallet-btn');
             if (connectWalletBtn) {
-                connectWalletBtn.addEventListener('click', function() {
-                    document.getElementById('walletConnectModal').classList.add('active');
-                });
-            }
-
-            // Обработчики для закрытия модальных окон
-            document.querySelectorAll('.close-modal').forEach(button => {
-                button.addEventListener('click', function() {
-                    this.closest('.wallet-connect-modal, .gift-modal').classList.remove('active');
-                    document.getElementById('allWalletsModal').classList.remove('active');
-                });
-            });
-
-            // Обработчик для кнопки "View all wallets"
-            const viewAllWalletsBtn = document.querySelector('.wallet-option[onclick="connectWallet(\'all\')"]');
-            if (viewAllWalletsBtn) {
-                viewAllWalletsBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    document.getElementById('walletConnectModal').classList.remove('active');
-                    document.getElementById('allWalletsModal').classList.add('active');
-                });
-            }
-
-            // Обработчик для кнопки копирования ссылки
-            const copyBtn = document.querySelector('.copy-btn');
-            if (copyBtn) {
-                copyBtn.addEventListener('click', function() {
-                    copyToClipboard('ton://connect');
-                });
-            }
-
-            // Обработчик для Trade Market карточки
-            const tradeMarketCard = document.getElementById('trade-market-card');
-            if (tradeMarketCard) {
-                tradeMarketCard.addEventListener('click', function() {
-                    console.log('Trade Market clicked');
+                connectWalletBtn.addEventListener('click', () => {
+                    connectWallet('telegram');
                 });
             }
 
@@ -1706,15 +1600,20 @@
                 closeModalBtn.addEventListener('click', hideGiftModal);
             }
 
-            // Устанавливаем начальный активный таб
-            setActiveTab('nft');
+            // Обработчик для кнопки копирования ссылки
+            const copyLinkBtn = document.querySelector('.copy-link-btn');
+            if (copyLinkBtn) {
+                copyLinkBtn.addEventListener('click', () => {
+                    const link = window.location.href;
+                    copyToClipboard(link);
+                });
+            }
 
-            // Проверяем предыдущее подключение кошелька
-            const isWalletConnected = localStorage.getItem('walletConnected');
-            const walletAddress = localStorage.getItem('walletAddress');
-            if (isWalletConnected && walletAddress) {
-                document.getElementById('wallet-status').textContent = `Connected: ${walletAddress}`;
-                document.getElementById('connect-wallet-btn').style.display = 'none';
+            // Проверяем наличие подключенного кошелька
+            const connectedWallet = localStorage.getItem('connectedWallet');
+            if (connectedWallet) {
+                const walletData = JSON.parse(connectedWallet);
+                updateWalletUI(walletData.address);
             }
         });
     </script>

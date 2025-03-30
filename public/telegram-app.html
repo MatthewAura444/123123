@@ -1428,6 +1428,137 @@
                 -webkit-tap-highlight-color: transparent;
             }
         }
+
+        /* Модальное окно создания объявления */
+        .create-listing-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .create-listing-modal.active {
+            display: flex;
+        }
+
+        .user-gifts-section {
+            margin-bottom: 24px;
+        }
+
+        .user-gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .user-gift-card {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: var(--animation-normal);
+        }
+
+        .user-gift-card.selected {
+            border-color: var(--tg-theme-accent-text-color);
+            transform: scale(1.05);
+        }
+
+        .user-gift-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .user-gift-image {
+            width: 100%;
+            padding-top: 100%;
+            position: relative;
+            background: var(--gradient-light);
+        }
+
+        .user-gift-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-gift-info {
+            padding: 12px;
+        }
+
+        .user-gift-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color);
+            margin-bottom: 4px;
+        }
+
+        .listing-form {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--tg-theme-text-color);
+            font-size: 16px;
+            outline: none;
+            transition: var(--animation-normal);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--tg-theme-accent-text-color);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 12px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--animation-normal);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
     </style>
 </head>
 <body>
@@ -1676,6 +1807,36 @@
                     </div>
                     <div class="gifts-grid" id="giftsContainer">
                         <!-- Здесь будут отображаться подарки -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно создания объявления -->
+        <div class="create-listing-modal" id="createListingModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Создать объявление</h2>
+                    <button class="close-modal" onclick="hideCreateListing()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="user-gifts-section">
+                        <h3>Ваши подарки</h3>
+                        <div class="user-gifts-grid" id="userGiftsContainer">
+                            <!-- Здесь будут отображаться подарки пользователя -->
+                        </div>
+                    </div>
+                    <div class="listing-form" id="listingForm" style="display: none;">
+                        <h3>Детали объявления</h3>
+                        <div class="form-group">
+                            <label>Цена (TON)</label>
+                            <input type="number" id="giftPrice" min="0" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Описание</label>
+                            <textarea id="giftDescription" rows="3"></textarea>
+                        </div>
+                        <button class="submit-button" onclick="createListing()">Создать объявление</button>
                     </div>
                 </div>
             </div>
@@ -1979,6 +2140,158 @@
                     console.log('Sorting by:', e.target.value);
                 });
             }
+
+            // Функция для получения подарков пользователя из Telegram
+            async function getUserGifts() {
+                const tg = window.Telegram.WebApp;
+                // Здесь будет запрос к API Telegram для получения подарков
+                // Пока используем тестовые данные
+                const userGifts = [
+                    {
+                        id: '1',
+                        name: 'Christmas Gift',
+                        image: 'https://via.placeholder.com/150',
+                        type: 'holiday'
+                    },
+                    {
+                        id: '2',
+                        name: 'Birthday Present',
+                        image: 'https://via.placeholder.com/150',
+                        type: 'birthday'
+                    }
+                ];
+
+                return userGifts;
+            }
+
+            // Функция для отображения подарков пользователя
+            async function displayUserGifts() {
+                const container = document.getElementById('userGiftsContainer');
+                const gifts = await getUserGifts();
+
+                container.innerHTML = gifts.map(gift => `
+                    <div class="user-gift-card" data-gift-id="${gift.id}" onclick="selectGift('${gift.id}')">
+                        <div class="user-gift-image">
+                            <img src="${gift.image}" alt="${gift.name}">
+                        </div>
+                        <div class="user-gift-info">
+                            <div class="user-gift-name">${gift.name}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Функция для выбора подарка
+            function selectGift(giftId) {
+                const cards = document.querySelectorAll('.user-gift-card');
+                cards.forEach(card => {
+                    if (card.dataset.giftId === giftId) {
+                        card.classList.toggle('selected');
+                        document.getElementById('listingForm').style.display = 
+                            card.classList.contains('selected') ? 'block' : 'none';
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                });
+            }
+
+            // Функция для создания объявления
+            async function createListing() {
+                const selectedGift = document.querySelector('.user-gift-card.selected');
+                if (!selectedGift) {
+                    alert('Пожалуйста, выберите подарок');
+                    return;
+                }
+
+                const giftId = selectedGift.dataset.giftId;
+                const price = document.getElementById('giftPrice').value;
+                const description = document.getElementById('giftDescription').value;
+
+                if (!price) {
+                    alert('Пожалуйста, укажите цену');
+                    return;
+                }
+
+                try {
+                    // Здесь будет логика создания объявления
+                    console.log('Creating listing:', {
+                        giftId,
+                        price,
+                        description
+                    });
+
+                    // После успешного создания
+                    hideCreateListing();
+                    showTradeMarket(); // Обновляем и показываем Trade Market
+                } catch (error) {
+                    console.error('Error creating listing:', error);
+                    alert('Произошла ошибка при создании объявления');
+                }
+            }
+
+            // Функция для открытия окна создания объявления
+            function showCreateListing() {
+                const modal = document.getElementById('createListingModal');
+                modal.classList.add('active');
+                displayUserGifts();
+                document.getElementById('listingForm').style.display = 'none';
+            }
+
+            // Функция для закрытия окна создания объявления
+            function hideCreateListing() {
+                const modal = document.getElementById('createListingModal');
+                modal.classList.remove('active');
+            }
+
+            // Добавляем кнопку создания объявления в Trade Market
+            document.addEventListener('DOMContentLoaded', function() {
+                // ... existing code ...
+
+                // Добавляем кнопку создания объявления
+                const marketFilters = document.querySelector('.market-filters');
+                if (marketFilters) {
+                    const createButton = document.createElement('button');
+                    createButton.className = 'create-listing-btn';
+                    createButton.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Создать объявление
+                    `;
+                    createButton.onclick = showCreateListing;
+                    marketFilters.appendChild(createButton);
+                }
+            });
+
+            // Добавляем стили для кнопки создания объявления
+            const style = document.createElement('style');
+            style.textContent = `
+                .create-listing-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 16px;
+                    background: var(--gradient-primary);
+                    border: none;
+                    border-radius: 12px;
+                    color: white;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: var(--animation-normal);
+                }
+
+                .create-listing-btn svg {
+                    width: 20px;
+                    height: 20px;
+                }
+
+                .create-listing-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: var(--shadow-lg);
+                }
+            `;
+            document.head.appendChild(style);
         });
     </script>
 </body>

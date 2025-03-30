@@ -1,43 +1,123 @@
-/* Стили для карточки подарка в коллекции */
-.collection-gift-card {
+/* Стили для карточек подарков */
+.gifts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    padding: 16px;
+}
+
+.gift-card {
     background: var(--glass-bg);
-    border-radius: 24px;
+    border-radius: 20px;
     overflow: hidden;
     transition: var(--animation-normal);
-    position: relative;
-    box-shadow: var(--shadow-md);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-md);
+}
+
+.gift-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.gift-image {
+    width: 100%;
+    padding-top: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.gift-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--animation-normal);
+}
+
+.gift-card:hover .gift-image img {
+    transform: scale(1.05);
+}
+
+.gift-info {
+    padding: 20px;
+}
+
+.gift-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--tg-theme-text-color);
+}
+
+.gift-model {
+    font-size: 16px;
+    color: var(--tg-theme-hint-color);
+    margin-bottom: 16px;
+}
+
+.gift-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tg-theme-accent-text-color);
+}
+
+.gift-price svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--tg-theme-accent-text-color);
+}
+
+/* Стили для коллекций */
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.collection-gift-card {
+    background: var(--glass-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: var(--animation-normal);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-md);
 }
 
 .collection-gift-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--tg-theme-accent-text-color);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
 }
 
 .collection-gift-preview {
     width: 100%;
     padding-top: 100%;
     position: relative;
-    background: var(--gradient-light);
     overflow: hidden;
 }
 
 .collection-gift-preview img {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 85%;
-    height: 85%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     transition: var(--animation-normal);
 }
 
 .collection-gift-card:hover .collection-gift-preview img {
-    transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+    transform: scale(1.05);
 }
 
 .collection-gift-info {
@@ -45,16 +125,14 @@
 }
 
 .collection-gift-name {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     margin-bottom: 8px;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--tg-theme-text-color);
 }
 
 .collection-gift-type {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--tg-theme-hint-color);
     margin-bottom: 16px;
 }
@@ -68,17 +146,12 @@
     color: white;
     font-size: 16px;
     font-weight: 600;
-    cursor: pointer;
-    transition: var(--animation-normal);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-}
-
-.sell-gift-btn svg {
-    width: 20px;
-    height: 20px;
+    cursor: pointer;
+    transition: var(--animation-normal);
 }
 
 .sell-gift-btn:hover {
@@ -86,85 +159,206 @@
     box-shadow: var(--shadow-lg);
 }
 
-/* Модальное окно установки цены */
-.set-price-modal {
+.sell-gift-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Стили для модального окна */
+.modal {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    z-index: 1000;
-    display: none;
+}
+
+.modal.active {
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
 }
 
-.set-price-modal.active {
-    display: flex;
-}
-
-.set-price-content {
+.modal-content {
     background: var(--glass-bg);
     border-radius: 24px;
-    max-width: 400px;
-    width: 100%;
+    padding: 24px;
+    width: 90%;
+    max-width: 480px;
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     box-shadow: var(--shadow-xl);
 }
 
-.set-price-header {
+.modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
-    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 24px;
 }
 
-.set-price-header h2 {
-    font-size: 20px;
+.modal-header h2 {
+    font-size: 24px;
     font-weight: 700;
-    margin: 0;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--tg-theme-text-color);
 }
 
-.set-price-body {
-    padding: 20px;
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--tg-theme-hint-color);
+    font-size: 32px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
 }
 
 .gift-preview {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     padding: 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
 }
 
 .gift-preview img {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     border-radius: 12px;
     object-fit: cover;
 }
 
 .gift-preview-info h3 {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
-    margin: 0 0 4px;
     color: var(--tg-theme-text-color);
+    margin-bottom: 4px;
 }
 
 .gift-preview-info p {
     font-size: 14px;
     color: var(--tg-theme-hint-color);
-    margin: 0;
+}
+
+.price-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.price-input-container input,
+.price-input-container textarea {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--tg-theme-text-color);
+    font-size: 16px;
+}
+
+.price-input-container textarea {
+    height: 100px;
+    resize: none;
+}
+
+.confirm-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--animation-normal);
+}
+
+.confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Стили для профиля */
+.profile-container {
+    padding: 24px;
+    background: var(--glass-bg);
+    border-radius: 24px;
+    margin: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--glass-border);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--tg-theme-accent-text-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--tg-theme-text-color);
+    margin-bottom: 8px;
+}
+
+.profile-info p {
+    font-size: 16px;
+    color: var(--tg-theme-hint-color);
+}
+
+.wallet-section {
+    margin-top: 32px;
+}
+
+.connect-wallet-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: var(--animation-normal);
+}
+
+.connect-wallet-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.connect-wallet-btn svg {
+    width: 24px;
+    height: 24px;
 } 

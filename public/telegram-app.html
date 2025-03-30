@@ -1249,7 +1249,7 @@
             <div class="nav-tab" data-tab="profile">Profile</div>
         </div>
 
-        <div class="tab-content" id="nft-tab">
+        <div class="tab-content" id="nft">
             <div class="nft-container">
                 <div class="nft-markets">
                     <div class="market-card" id="trade-market-card">
@@ -1276,7 +1276,7 @@
             </div>
         </div>
 
-        <div class="tab-content" id="collections-tab">
+        <div class="tab-content" id="collections">
             <div class="collections-container">
                 <div class="collections-header">
                     <div class="collections-title">My Collections</div>
@@ -1295,7 +1295,7 @@
             </div>
         </div>
 
-        <div class="tab-content" id="profile-tab">
+        <div class="tab-content" id="profile">
             <div class="profile-container">
                 <div class="profile-header">
                     <div class="profile-avatar">
@@ -1454,12 +1454,12 @@
         // Функция для установки активного таба
         function setActiveTab(tabId) {
             // Убираем активный класс у всех табов
-            document.querySelectorAll('.tab').forEach(tab => {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             
             // Добавляем активный класс выбранному табу
-            const selectedTab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+            const selectedTab = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
             if (selectedTab) {
                 selectedTab.classList.add('active');
             }
@@ -1528,9 +1528,9 @@
 
         // Функция для обновления UI кошелька
         function updateWalletUI(address) {
-            const walletAddress = document.querySelector('.wallet-address');
-            if (walletAddress) {
-                walletAddress.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+            const walletStatus = document.getElementById('wallet-status');
+            if (walletStatus) {
+                walletStatus.textContent = `Connected: ${address.slice(0, 6)}...${address.slice(-4)}`;
             }
         }
 
@@ -1540,13 +1540,13 @@
             tg.ready();
             
             // Показываем основной контент
-            document.querySelector('.main-content').style.display = 'block';
+            document.querySelector('.app-container').style.display = 'block';
             
             // Устанавливаем начальный активный таб
             setActiveTab('nft');
             
             // Обработчики для табов
-            document.querySelectorAll('.tab').forEach(tab => {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabId = tab.getAttribute('data-tab');
                     setActiveTab(tabId);
@@ -1554,7 +1554,7 @@
             });
 
             // Обработчик для кнопки подключения кошелька
-            const connectWalletBtn = document.querySelector('.connect-wallet-btn');
+            const connectWalletBtn = document.getElementById('connect-wallet-btn');
             if (connectWalletBtn) {
                 connectWalletBtn.addEventListener('click', () => {
                     connectWallet('telegram');
@@ -1562,7 +1562,7 @@
             }
 
             // Обработчик для кнопки Create Collection
-            const createCollectionBtn = document.querySelector('.action-card');
+            const createCollectionBtn = document.querySelector('.collection-actions .action-card');
             if (createCollectionBtn) {
                 createCollectionBtn.addEventListener('click', createNewGift);
             }
@@ -1598,15 +1598,6 @@
             const closeModalBtn = document.querySelector('.gift-modal .close-modal');
             if (closeModalBtn) {
                 closeModalBtn.addEventListener('click', hideGiftModal);
-            }
-
-            // Обработчик для кнопки копирования ссылки
-            const copyLinkBtn = document.querySelector('.copy-link-btn');
-            if (copyLinkBtn) {
-                copyLinkBtn.addEventListener('click', () => {
-                    const link = window.location.href;
-                    copyToClipboard(link);
-                });
             }
 
             // Проверяем наличие подключенного кошелька

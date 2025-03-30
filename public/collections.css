@@ -1,0 +1,170 @@
+/* Стили для карточки подарка в коллекции */
+.collection-gift-card {
+    background: var(--glass-bg);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: var(--animation-normal);
+    position: relative;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.collection-gift-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--tg-theme-accent-text-color);
+}
+
+.collection-gift-preview {
+    width: 100%;
+    padding-top: 100%;
+    position: relative;
+    background: var(--gradient-light);
+    overflow: hidden;
+}
+
+.collection-gift-preview img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    height: 85%;
+    object-fit: cover;
+    transition: var(--animation-normal);
+}
+
+.collection-gift-card:hover .collection-gift-preview img {
+    transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+}
+
+.collection-gift-info {
+    padding: 20px;
+}
+
+.collection-gift-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.collection-gift-type {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+    margin-bottom: 16px;
+}
+
+.sell-gift-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--animation-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.sell-gift-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.sell-gift-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Модальное окно установки цены */
+.set-price-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.set-price-modal.active {
+    display: flex;
+}
+
+.set-price-content {
+    background: var(--glass-bg);
+    border-radius: 24px;
+    max-width: 400px;
+    width: 100%;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-xl);
+}
+
+.set-price-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.set-price-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.set-price-body {
+    padding: 20px;
+}
+
+.gift-preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.gift-preview img {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.gift-preview-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--tg-theme-text-color);
+}
+
+.gift-preview-info p {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+    margin: 0;
+} 

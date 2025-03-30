@@ -1559,286 +1559,199 @@
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
         }
+
+        /* Стили для карточки подарка в коллекции */
+        .collection-gift-card {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: var(--animation-normal);
+            position: relative;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .collection-gift-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--tg-theme-accent-text-color);
+        }
+
+        .collection-gift-preview {
+            width: 100%;
+            padding-top: 100%;
+            position: relative;
+            background: var(--gradient-light);
+            overflow: hidden;
+        }
+
+        .collection-gift-preview img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            height: 85%;
+            object-fit: cover;
+            transition: var(--animation-normal);
+        }
+
+        .collection-gift-card:hover .collection-gift-preview img {
+            transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+        }
+
+        .collection-gift-info {
+            padding: 20px;
+        }
+
+        .collection-gift-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .collection-gift-type {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+            margin-bottom: 16px;
+        }
+
+        .sell-gift-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--animation-normal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .sell-gift-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sell-gift-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Модальное окно установки цены */
+        .set-price-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .set-price-modal.active {
+            display: flex;
+        }
+
+        .set-price-content {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .set-price-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .set-price-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .set-price-body {
+            padding: 20px;
+        }
+
+        .gift-preview {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .gift-preview img {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .gift-preview-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 4px;
+            color: var(--tg-theme-text-color);
+        }
+
+        .gift-preview-info p {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+            margin: 0;
+        }
     </style>
-</head>
-<body>
-    <div class="app-container">
-        <div class="header">
-            <h1>TelegramGift</h1>
-        </div>
 
-        <div class="nav-tabs">
-            <div class="nav-tab" data-tab="nft">NFT</div>
-            <div class="nav-tab" data-tab="collections">Collections</div>
-            <div class="nav-tab" data-tab="profile">Profile</div>
-        </div>
-
-        <div class="tab-content" id="nft">
-            <div class="nft-container">
-                <div class="nft-markets">
-                    <div class="market-card" id="trade-market-card">
-                        <div class="market-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                                <path d="M9 22V12h6v10"/>
-                            </svg>
-                        </div>
-                        <div class="market-title">Trade Market</div>
-                        <div class="market-description">Buy and sell gifts instantly</div>
-                        <div class="market-stats">
-                            <div class="market-stat">
-                                <div class="stat-value" id="active-sellers">0</div>
-                                <div class="stat-label">Active Sellers</div>
-                            </div>
-                            <div class="market-stat">
-                                <div class="stat-value" id="active-gifts">0</div>
-                                <div class="stat-label">Available Gifts</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Модальное окно установки цены -->
+    <div class="set-price-modal" id="setPriceModal">
+        <div class="set-price-content">
+            <div class="set-price-header">
+                <h2>Установить цену</h2>
+                <button class="close-modal" onclick="hideSetPriceModal()">×</button>
             </div>
-        </div>
-
-        <div class="tab-content" id="collections">
-            <div class="collections-container">
-                <div class="collections-header">
-                    <div class="collections-title">My Collections</div>
+            <div class="set-price-body">
+                <div class="gift-preview" id="selectedGiftPreview">
+                    <!-- Здесь будет превью выбранного подарка -->
                 </div>
-
-                <div class="collection-actions">
-                    <div class="action-card">
-                        <div class="lottie-container" id="giftAnimation"></div>
-                        <div class="action-title">Create Gift</div>
-                        <div class="action-subtitle">List your gift for sale</div>
-                    </div>
+                <div class="form-group">
+                    <label>Цена (TON)</label>
+                    <input type="number" id="setPriceInput" min="0" step="0.1" required>
                 </div>
-
-                <div class="collections-grid">
+                <div class="form-group">
+                    <label>Описание (необязательно)</label>
+                    <textarea id="setPriceDescription" rows="3"></textarea>
                 </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="profile">
-            <div class="profile-container">
-                <div class="profile-header">
-                    <div class="profile-avatar">
-                        <div class="profile-avatar-placeholder">
-                        </div>
-                    </div>
-                    <div class="profile-info">
-                        <div class="profile-name">
-                        </div>
-                        <button id="connect-wallet-btn">Connect TON Wallet</button>
-                        <div id="wallet-status"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Модальное окно подключения кошелька -->
-        <div class="wallet-connect-modal" id="walletConnectModal">
-            <div class="wallet-connect-content">
-                <div class="wallet-connect-header">
-                    <h2>Connect your wallet</h2>
-                    <button class="close-modal" onclick="hideWalletConnect()">×</button>
-                </div>
-                <div class="wallet-connect-body">
-                    <div class="qr-section">
-                        <p>Scan with your mobile wallet</p>
-                        <div class="qr-code">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ton://connect" alt="QR Code">
-                        </div>
-                        <button class="copy-btn" onclick="copyToClipboard('ton://connect')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                            </svg>
-                            Copy Link
-                        </button>
-                    </div>
-                    <div class="available-wallets">
-                        <p>Available wallets</p>
-                        <div class="wallet-list">
-                            <button class="wallet-option" onclick="connectWallet('telegram')">
-                                <img src="https://ton.org/telegram-wallet.svg" alt="Wallet on Telegram">
-                                <span>Wallet On Telegram</span>
-                                <span class="wallet-tag">Popular</span>
-                            </button>
-                            <button class="wallet-option" onclick="connectWallet('tonkeeper')">
-                                <img src="https://ton.org/tonkeeper.svg" alt="Tonkeeper">
-                                <span>Tonkeeper</span>
-                            </button>
-                            <button class="wallet-option" onclick="connectWallet('mytonwallet')">
-                                <img src="https://ton.org/mytonwallet.svg" alt="MyTonWallet">
-                                <span>MyTonWallet</span>
-                            </button>
-                            <button class="wallet-option" onclick="connectWallet('all')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 6h16M4 12h16m-7 6h7"/>
-                                </svg>
-                                <span>View all wallets</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Модальное окно со всеми кошельками -->
-        <div class="all-wallets-modal" id="allWalletsModal">
-            <div class="all-wallets-content">
-                <div class="wallet-connect-header">
-                    <h2>Wallets</h2>
-                    <button class="close-modal" onclick="hideAllWallets()">×</button>
-                </div>
-                <div class="wallet-connect-body">
-                    <div class="all-wallets-grid">
-                        <button class="wallet-card" onclick="connectWallet('telegram')">
-                            <img src="https://ton.org/telegram-wallet.svg" alt="Wallet on Telegram">
-                            <span>Wallet On Telegram</span>
-                            <span class="wallet-tag">Popular</span>
-                        </button>
-                        <button class="wallet-card" onclick="connectWallet('tonkeeper')">
-                            <img src="https://ton.org/tonkeeper.svg" alt="Tonkeeper">
-                            <span>Tonkeeper</span>
-                        </button>
-                        <button class="wallet-card" onclick="connectWallet('mytonwallet')">
-                            <img src="https://ton.org/mytonwallet.svg" alt="MyTonWallet">
-                            <span>MyTonWallet</span>
-                        </button>
-                        <button class="wallet-card" onclick="connectWallet('openmask')">
-                            <img src="https://raw.githubusercontent.com/OpenProduct/openmask-extension/main/public/openmask-logo-128.png" alt="OpenMask">
-                            <span>OpenMask</span>
-                        </button>
-                        <button class="wallet-card" onclick="connectWallet('tonhub')">
-                            <img src="https://ton.org/tonhub.svg" alt="Tonhub">
-                            <span>Tonhub</span>
-                        </button>
-                        <button class="wallet-card" onclick="connectWallet('deliwallet')">
-                            <img src="https://ton.org/deliwallet.png" alt="DeliWallet">
-                            <span>DeliWallet</span>
-                        </button>
-                        <button class="wallet-card" onclick="connectWallet('tonflow')">
-                            <img src="https://ton.org/tonflow.svg" alt="TON Flow">
-                            <span>TON Flow</span>
-                        </button>
-                        <button class="wallet-card" onclick="connectWallet('xtonwallet')">
-                            <img src="https://ton.org/xtonwallet.svg" alt="XTON Wallet">
-                            <span>XTON Wallet</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Модальное окно создания подарка -->
-        <div class="gift-modal" id="giftModal">
-            <div class="gift-modal-content">
-                <div class="gift-modal-header">
-                    <h2>Create New Gift</h2>
-                    <button class="close-modal">×</button>
-                </div>
-                <div class="gift-modal-body">
-                    <form id="gift-form">
-                        <div class="form-group">
-                            <label>Gift Name</label>
-                            <input type="text" name="giftName" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Gift Model</label>
-                            <input type="text" name="giftModel" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Background</label>
-                            <input type="text" name="background" placeholder="Enter background color or description" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Pattern</label>
-                            <input type="text" name="pattern" placeholder="Enter pattern description" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Gift Photos</label>
-                            <label class="file-input-label" for="giftPhotos">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                                    <path d="M17 8l-5-5-5 5"/>
-                                    <path d="M12 3v12"/>
-                                </svg>
-                                <span>Choose gift photos</span>
-                            </label>
-                            <input type="file" id="giftPhotos" name="giftPhotos" accept="image/*" multiple>
-                            <div class="file-preview" id="photos-preview"></div>
-                        </div>
-                        <div class="form-group">
-                            <label>Price (TON)</label>
-                            <input type="number" name="price" required min="0" step="0.1">
-                        </div>
-                        <button type="submit" class="submit-btn">Create Gift</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Модальное окно Trade Market -->
-        <div class="trade-market-modal" id="tradeMarketModal">
-            <div class="trade-market-content">
-                <div class="modal-header">
-                    <h2>Trade Market</h2>
-                    <button class="close-modal" onclick="hideTradeMarket()">×</button>
-                </div>
-                <div class="modal-body">
-                    <div class="market-filters">
-                        <div class="search-bar">
-                            <input type="text" placeholder="Search gifts..." id="giftSearch">
-                            <button class="search-btn">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="filter-options">
-                            <select id="sortFilter">
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
-                                <option value="priceAsc">Price: Low to High</option>
-                                <option value="priceDesc">Price: High to Low</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="gifts-grid" id="giftsContainer">
-                        <!-- Здесь будут отображаться подарки -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Модальное окно создания объявления -->
-        <div class="create-listing-modal" id="createListingModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Создать объявление</h2>
-                    <button class="close-modal" onclick="hideCreateListing()">×</button>
-                </div>
-                <div class="modal-body">
-                    <div class="user-gifts-section">
-                        <h3>Ваши подарки</h3>
-                        <div class="user-gifts-grid" id="userGiftsContainer">
-                            <!-- Здесь будут отображаться подарки пользователя -->
-                        </div>
-                    </div>
-                    <div class="listing-form" id="listingForm" style="display: none;">
-                        <h3>Детали объявления</h3>
-                        <div class="form-group">
-                            <label>Цена (TON)</label>
-                            <input type="number" id="giftPrice" min="0" step="0.1" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Описание</label>
-                            <textarea id="giftDescription" rows="3"></textarea>
-                        </div>
-                        <button class="submit-button" onclick="createListing()">Создать объявление</button>
-                    </div>
-                </div>
+                <button class="submit-button" onclick="listGiftForSale()">Выставить на продажу</button>
             </div>
         </div>
     </div>
@@ -2292,6 +2205,115 @@
                 }
             `;
             document.head.appendChild(style);
+
+            // Функция для получения подарков пользователя
+            async function getUserCollectionGifts() {
+                const tg = window.Telegram.WebApp;
+                // Здесь будет запрос к API Telegram для получения подарков
+                // Пока используем тестовые данные
+                const userGifts = [
+                    {
+                        id: '1',
+                        name: 'Christmas Gift',
+                        type: 'Holiday Collection',
+                        image: 'https://via.placeholder.com/300',
+                    },
+                    {
+                        id: '2',
+                        name: 'Birthday Present',
+                        type: 'Special Collection',
+                        image: 'https://via.placeholder.com/300',
+                    }
+                ];
+
+                return userGifts;
+            }
+
+            // Функция для отображения подарков в коллекции
+            async function displayUserCollectionGifts() {
+                const container = document.getElementById('userCollectionsGrid');
+                const gifts = await getUserCollectionGifts();
+
+                container.innerHTML = gifts.map(gift => `
+                    <div class="collection-gift-card" data-gift-id="${gift.id}">
+                        <div class="collection-gift-preview">
+                            <img src="${gift.image}" alt="${gift.name}">
+                        </div>
+                        <div class="collection-gift-info">
+                            <div class="collection-gift-name">${gift.name}</div>
+                            <div class="collection-gift-type">${gift.type}</div>
+                            <button class="sell-gift-btn" onclick="showSetPriceModal('${gift.id}', '${gift.name}', '${gift.type}', '${gift.image}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 8v8m-4-4h8"/>
+                                </svg>
+                                Выставить на продажу
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Функция для открытия модального окна установки цены
+            function showSetPriceModal(giftId, giftName, giftType, giftImage) {
+                const modal = document.getElementById('setPriceModal');
+                const preview = document.getElementById('selectedGiftPreview');
+
+                preview.innerHTML = `
+                    <img src="${giftImage}" alt="${giftName}">
+                    <div class="gift-preview-info">
+                        <h3>${giftName}</h3>
+                        <p>${giftType}</p>
+                    </div>
+                `;
+
+                preview.dataset.giftId = giftId;
+                modal.classList.add('active');
+            }
+
+            // Функция для закрытия модального окна установки цены
+            function hideSetPriceModal() {
+                const modal = document.getElementById('setPriceModal');
+                modal.classList.remove('active');
+                document.getElementById('setPriceInput').value = '';
+                document.getElementById('setPriceDescription').value = '';
+            }
+
+            // Функция для выставления подарка на продажу
+            async function listGiftForSale() {
+                const preview = document.getElementById('selectedGiftPreview');
+                const giftId = preview.dataset.giftId;
+                const price = document.getElementById('setPriceInput').value;
+                const description = document.getElementById('setPriceDescription').value;
+
+                if (!price) {
+                    alert('Пожалуйста, укажите цену');
+                    return;
+                }
+
+                try {
+                    // Здесь будет логика создания объявления
+                    console.log('Creating listing:', {
+                        giftId,
+                        price,
+                        description
+                    });
+
+                    // После успешного создания
+                    hideSetPriceModal();
+                    showTradeMarket(); // Показываем Trade Market с обновленным списком
+                } catch (error) {
+                    console.error('Error creating listing:', error);
+                    alert('Произошла ошибка при создании объявления');
+                }
+            }
+
+            // Добавляем инициализацию отображения подарков при загрузке страницы
+            document.addEventListener('DOMContentLoaded', function() {
+                // ... existing code ...
+
+                // Отображаем подарки пользователя в коллекции
+                displayUserCollectionGifts();
+            });
         });
     </script>
 </body>

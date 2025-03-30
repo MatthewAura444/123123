@@ -644,20 +644,107 @@
             display: flex;
         }
 
-        .trade-market-gifts {
+        .trade-market-content {
             background: var(--glass-bg);
             border-radius: 24px;
-            padding: 24px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 80vh;
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 20px;
             overflow-y: auto;
+        }
+
+        .market-filters {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .search-bar input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--tg-theme-text-color);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            color: var(--tg-theme-hint-color);
+            transition: var(--animation-normal);
+        }
+
+        .search-btn:hover {
+            color: var(--tg-theme-text-color);
+            transform: scale(1.1);
+        }
+
+        .filter-options select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: var(--tg-theme-text-color);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            outline: none;
+            transition: var(--animation-normal);
+        }
+
+        .filter-options select:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .gifts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            padding: 20px 0;
         }
 
         .gift-card {
@@ -666,6 +753,7 @@
             overflow: hidden;
             transition: var(--animation-normal);
             border: 1px solid var(--glass-border);
+            cursor: pointer;
         }
 
         .gift-card:hover {
@@ -679,6 +767,7 @@
             padding-top: 100%;
             position: relative;
             background: var(--gradient-light);
+            overflow: hidden;
         }
 
         .gift-image img {
@@ -688,6 +777,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: var(--animation-normal);
+        }
+
+        .gift-card:hover .gift-image img {
+            transform: scale(1.1);
         }
 
         .gift-info {
@@ -695,24 +789,30 @@
         }
 
         .gift-name {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             margin-bottom: 8px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--tg-theme-text-color);
+        }
+
+        .gift-model {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+            margin-bottom: 12px;
         }
 
         .gift-price {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--tg-theme-accent-text-color);
-            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .gift-seller {
-            font-size: 14px;
-            color: var(--tg-theme-hint-color);
+        .gift-price svg {
+            width: 16px;
+            height: 16px;
         }
 
         .profile-container {
@@ -1547,6 +1647,39 @@
                 </div>
             </div>
         </div>
+
+        <!-- Модальное окно Trade Market -->
+        <div class="trade-market-modal" id="tradeMarketModal">
+            <div class="trade-market-content">
+                <div class="modal-header">
+                    <h2>Trade Market</h2>
+                    <button class="close-modal" onclick="hideTradeMarket()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="market-filters">
+                        <div class="search-bar">
+                            <input type="text" placeholder="Search gifts..." id="giftSearch">
+                            <button class="search-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="filter-options">
+                            <select id="sortFilter">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="priceAsc">Price: Low to High</option>
+                                <option value="priceDesc">Price: High to Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="gifts-grid" id="giftsContainer">
+                        <!-- Здесь будут отображаться подарки -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1772,6 +1905,79 @@
                         ? `${files.length} files selected` 
                         : files[0].name;
                 }
+            }
+
+            // Функция для открытия Trade Market
+            function showTradeMarket() {
+                const modal = document.getElementById('tradeMarketModal');
+                modal.classList.add('active');
+                loadGifts(); // Загружаем подарки при открытии
+            }
+
+            // Функция для закрытия Trade Market
+            function hideTradeMarket() {
+                const modal = document.getElementById('tradeMarketModal');
+                modal.classList.remove('active');
+            }
+
+            // Функция для загрузки подарков
+            function loadGifts() {
+                const container = document.getElementById('giftsContainer');
+                // Здесь будет логика загрузки подарков с сервера
+                // Пока используем тестовые данные
+                const testGifts = [
+                    {
+                        name: 'Christmas Gift',
+                        model: 'Special Edition',
+                        price: '100',
+                        image: 'https://via.placeholder.com/300',
+                        background: 'Red',
+                        pattern: 'Snowflakes'
+                    },
+                    // Добавьте больше тестовых подарков по необходимости
+                ];
+
+                container.innerHTML = testGifts.map(gift => `
+                    <div class="gift-card">
+                        <div class="gift-image">
+                            <img src="${gift.image}" alt="${gift.name}">
+                        </div>
+                        <div class="gift-info">
+                            <div class="gift-name">${gift.name}</div>
+                            <div class="gift-model">${gift.model}</div>
+                            <div class="gift-price">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                                ${gift.price} TON
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Обработчик для карточки Trade Market
+            const tradeMarketCard = document.getElementById('trade-market-card');
+            if (tradeMarketCard) {
+                tradeMarketCard.addEventListener('click', showTradeMarket);
+            }
+
+            // Обработчик для поиска подарков
+            const searchInput = document.getElementById('giftSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    // Здесь будет логика поиска подарков
+                    console.log('Searching for:', e.target.value);
+                });
+            }
+
+            // Обработчик для фильтрации
+            const sortFilter = document.getElementById('sortFilter');
+            if (sortFilter) {
+                sortFilter.addEventListener('change', function(e) {
+                    // Здесь будет логика сортировки подарков
+                    console.log('Sorting by:', e.target.value);
+                });
             }
         });
     </script>

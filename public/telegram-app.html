@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>TelegramGift</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
@@ -1129,6 +1131,110 @@
             border-color: var(--tg-theme-button-text-color, #ffffff);
             box-shadow: 0 0 20px rgba(0, 136, 204, 0.3);
         }
+
+        /* Добавляем стили для модального окна создания подарка */
+        .gift-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .gift-modal.active {
+            display: flex;
+        }
+
+        .gift-modal-content {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .gift-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .gift-modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gift-modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--tg-theme-text-color);
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--tg-theme-text-color);
+            font-size: 16px;
+        }
+
+        .form-group input[type="file"] {
+            padding: 8px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--animation-normal);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Отключаем масштабирование на мобильных устройствах */
+        @media (max-width: 768px) {
+            body {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1158,11 +1264,11 @@
                         <div class="market-stats">
                             <div class="market-stat">
                                 <div class="stat-value" id="active-sellers">0</div>
-                                <div class="stat-label">Sellers</div>
+                                <div class="stat-label">Active Sellers</div>
                             </div>
                             <div class="market-stat">
                                 <div class="stat-value" id="active-gifts">0</div>
-                                <div class="stat-label">Gifts</div>
+                                <div class="stat-label">Available Gifts</div>
                             </div>
                         </div>
                     </div>
@@ -1179,8 +1285,8 @@
                 <div class="collection-actions">
                     <div class="action-card">
                         <div class="lottie-container" id="giftAnimation"></div>
-                        <div class="action-title">Create Collection</div>
-                        <div class="action-subtitle">Create a new NFT collection</div>
+                        <div class="action-title">Create Gift</div>
+                        <div class="action-subtitle">List your gift for sale</div>
                     </div>
                 </div>
 
@@ -1306,6 +1412,121 @@
         // Инициализация Telegram Web App
         let tg = window.Telegram.WebApp;
         
+        // Константы
+        const PLATFORM_FEE_WALLET = 'UQASbk4JxjCjgU6Hj3mdW9iPiF-csOsPBLhLhEYoAQdt8vwY';
+        const PLATFORM_FEE_PERCENT = 2.5;
+
+        // Инициализация TON Connect
+        const connector = new TonConnect({
+            manifestUrl: 'https://matthewaura444.github.io/123123/public/tonconnect-manifest.json'
+        });
+
+        // Функция для подключения кошелька
+        async function connectWallet(type) {
+            try {
+                if (type === 'telegram') {
+                    // Проверяем, доступен ли Telegram Wallet
+                    if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+                        // Создаем запрос на подключение через Telegram Wallet
+                        const universalLink = 'ton://connect?v=2&r=https://t.me/wallet';
+                        window.Telegram.WebApp.openTelegramLink(universalLink);
+                        
+                        // Ждем подключения
+                        const wallet = await connector.connect({
+                            universalLink: universalLink,
+                            bridgeUrl: 'https://bridge.tonapi.io/bridge'
+                        });
+                        
+                        if (wallet) {
+                            // Получаем адрес кошелька
+                            const walletAddress = wallet.account.address;
+                            
+                            // Обновляем интерфейс
+                            document.getElementById('wallet-status').textContent = `Connected: ${walletAddress}`;
+                            document.getElementById('connect-wallet-btn').style.display = 'none';
+                            
+                            // Сохраняем информацию
+                            localStorage.setItem('walletConnected', 'true');
+                            localStorage.setItem('walletAddress', walletAddress);
+                        }
+                    } else {
+                        alert('Please open this app in Telegram');
+                    }
+                } else {
+                    // Для других кошельков используем стандартный процесс подключения
+                    const wallet = await connector.connect();
+                    if (wallet) {
+                        const walletAddress = wallet.account.address;
+                        document.getElementById('wallet-status').textContent = `Connected: ${walletAddress}`;
+                        document.getElementById('connect-wallet-btn').style.display = 'none';
+                        localStorage.setItem('walletConnected', 'true');
+                        localStorage.setItem('walletAddress', walletAddress);
+                    }
+                }
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                alert('Error connecting wallet. Please try again.');
+            }
+        }
+
+        // Функция для создания нового подарка
+        function createNewGift() {
+            const modal = document.createElement('div');
+            modal.className = 'gift-modal active';
+            modal.innerHTML = `
+                <div class="gift-modal-content">
+                    <div class="gift-modal-header">
+                        <h2>Create New Gift</h2>
+                        <button class="close-modal">×</button>
+                    </div>
+                    <div class="gift-modal-body">
+                        <form id="gift-form">
+                            <div class="form-group">
+                                <label>Gift Name</label>
+                                <input type="text" name="giftName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Gift Model</label>
+                                <input type="text" name="giftModel" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Background</label>
+                                <input type="file" name="background" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label>Pattern</label>
+                                <input type="file" name="pattern" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label>Gift Photos</label>
+                                <input type="file" name="giftPhotos" accept="image/*" multiple>
+                            </div>
+                            <div class="form-group">
+                                <label>Price (TON)</label>
+                                <input type="number" name="price" required min="0" step="0.1">
+                            </div>
+                            <button type="submit" class="submit-btn">Create Gift</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Обработчик закрытия модального окна
+            modal.querySelector('.close-modal').addEventListener('click', () => {
+                modal.remove();
+            });
+
+            // Обработчик отправки формы
+            modal.querySelector('#gift-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                // Здесь будет логика отправки данных на сервер
+                console.log('Gift data:', Object.fromEntries(formData));
+                modal.remove();
+            });
+        }
+
         // Функция для установки активного таба
         function setActiveTab(tabId) {
             // Убираем активный класс у всех табов
@@ -1326,12 +1547,6 @@
                 selectedTab.classList.add('active');
                 selectedContent.style.display = 'block';
             }
-        }
-
-        // Функция для подключения кошелька
-        function connectWallet(type) {
-            console.log('Connecting wallet:', type);
-            // Здесь будет логика подключения кошелька
         }
 
         // Функция для скрытия модального окна подключения кошелька
@@ -1356,6 +1571,20 @@
             // Инициализация Telegram Web App
             tg.ready();
             
+            // Отключаем масштабирование на мобильных устройствах
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Отключаем двойной тап для масштабирования
+            document.addEventListener('touchend', function(e) {
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
             // Получаем данные пользователя
             const user = tg.initDataUnsafe.user;
             console.log('Telegram Web App:', tg);
@@ -1372,13 +1601,11 @@
                 const profileAvatar = document.querySelector('.profile-avatar');
                 if (profileAvatar) {
                     if (user.photo_url) {
-                        // Устанавливаем фото профиля
                         profileAvatar.style.backgroundImage = `url(${user.photo_url})`;
                         profileAvatar.style.backgroundSize = 'cover';
                         profileAvatar.style.backgroundPosition = 'center';
-                        profileAvatar.textContent = ''; // Очищаем содержимое
+                        profileAvatar.textContent = '';
                     } else {
-                        // Если фото нет, показываем первую букву имени
                         profileAvatar.textContent = user.first_name.charAt(0).toUpperCase();
                         profileAvatar.style.backgroundColor = '#0088cc';
                         profileAvatar.style.color = 'white';
@@ -1388,8 +1615,6 @@
                         profileAvatar.style.fontSize = '24px';
                     }
                 }
-            } else {
-                console.log('User data not available');
             }
 
             // Обновляем цветовую схему
@@ -1418,7 +1643,7 @@
             // Обработчики для закрытия модальных окон
             document.querySelectorAll('.close-modal').forEach(button => {
                 button.addEventListener('click', function() {
-                    this.closest('.wallet-connect-modal').classList.remove('active');
+                    this.closest('.wallet-connect-modal, .gift-modal').classList.remove('active');
                     document.getElementById('allWalletsModal').classList.remove('active');
                 });
             });
@@ -1452,13 +1677,19 @@
             // Обработчик для кнопки Create Collection
             const createCollectionBtn = document.querySelector('.action-card');
             if (createCollectionBtn) {
-                createCollectionBtn.addEventListener('click', function() {
-                    console.log('Create Collection clicked');
-                });
+                createCollectionBtn.addEventListener('click', createNewGift);
             }
 
             // Устанавливаем начальный активный таб
             setActiveTab('nft');
+
+            // Проверяем предыдущее подключение кошелька
+            const isWalletConnected = localStorage.getItem('walletConnected');
+            const walletAddress = localStorage.getItem('walletAddress');
+            if (isWalletConnected && walletAddress) {
+                document.getElementById('wallet-status').textContent = `Connected: ${walletAddress}`;
+                document.getElementById('connect-wallet-btn').style.display = 'none';
+            }
         });
     </script>
 </body>

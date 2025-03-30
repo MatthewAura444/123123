@@ -391,10 +391,10 @@ async def delete_gift(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token
-    application = Application.builder().token(TOKEN).build()
+        application = Application.builder().token(TOKEN).build()
 
     # Add handlers
-    application.add_handler(CommandHandler("start", start))
+        application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("my_gifts", my_gifts))
     application.add_handler(CommandHandler("gift_count", gift_count))
     application.add_handler(CommandHandler("my_profile", my_profile))
@@ -402,7 +402,7 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web_app_data))
 
     # Start the Bot
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+        application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
     main() 

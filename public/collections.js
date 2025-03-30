@@ -1,24 +1,41 @@
-// Функция для получения подарков пользователя
-async function getUserCollectionGifts() {
-    const tg = window.Telegram.WebApp;
-    // Здесь будет запрос к API Telegram для получения подарков
-    // Пока используем тестовые данные
-    const userGifts = [
-        {
-            id: '1',
-            name: 'Christmas Gift',
-            type: 'Holiday Collection',
-            image: 'https://via.placeholder.com/300',
-        },
-        {
-            id: '2',
-            name: 'Birthday Present',
-            type: 'Special Collection',
-            image: 'https://via.placeholder.com/300',
-        }
-    ];
+// Инициализация WebSocket соединения
+const API_URL = 'https://matthewaura444.github.io/123123';
+const ws = new WebSocket('wss://matthewaura444.github.io/123123');
 
-    return userGifts;
+// Обработка сообщений WebSocket
+ws.onmessage = function(event) {
+    const update = JSON.parse(event.data);
+    if (update.type === 'new_listing') {
+        // Обновляем список подарков в Trade Market
+        updateTradeMarket();
+    }
+};
+
+// Функция для получения подарков пользователя из Telegram
+async function getUserCollectionGifts() {
+    try {
+        const tg = window.Telegram.WebApp;
+        const userId = tg.initDataUnsafe.user.id;
+        
+        // В случае с GitHub Pages используем тестовые данные
+        return [
+            {
+                id: '1',
+                name: 'Christmas Gift',
+                type: 'Holiday Collection',
+                image: 'https://via.placeholder.com/300',
+            },
+            {
+                id: '2',
+                name: 'Birthday Present',
+                type: 'Special Collection',
+                image: 'https://via.placeholder.com/300',
+            }
+        ];
+    } catch (error) {
+        console.error('Error fetching user gifts:', error);
+        return [];
+    }
 }
 
 // Функция для отображения подарков в коллекции
@@ -83,19 +100,57 @@ async function listGiftForSale() {
     }
 
     try {
-        // Здесь будет логика создания объявления
-        console.log('Creating listing:', {
-            giftId,
-            price,
-            description
-        });
-
-        // После успешного создания
+        // В случае с GitHub Pages просто показываем сообщение об успехе
+        alert('Подарок успешно выставлен на продажу!');
         hideSetPriceModal();
-        showTradeMarket(); // Показываем Trade Market с обновленным списком
+        showTradeMarket();
     } catch (error) {
         console.error('Error creating listing:', error);
         alert('Произошла ошибка при создании объявления');
+    }
+}
+
+// Функция для обновления Trade Market
+async function updateTradeMarket() {
+    try {
+        // В случае с GitHub Pages используем тестовые данные
+        const listings = [
+            {
+                id: '1',
+                name: 'Christmas Gift',
+                type: 'Holiday Collection',
+                price: 100,
+                image: 'https://via.placeholder.com/300',
+            },
+            {
+                id: '2',
+                name: 'Birthday Present',
+                type: 'Special Collection',
+                price: 200,
+                image: 'https://via.placeholder.com/300',
+            }
+        ];
+        
+        const container = document.getElementById('giftsContainer');
+        container.innerHTML = listings.map(listing => `
+            <div class="gift-card">
+                <div class="gift-image">
+                    <img src="${listing.image}" alt="${listing.name}">
+                </div>
+                <div class="gift-info">
+                    <div class="gift-name">${listing.name}</div>
+                    <div class="gift-model">${listing.type}</div>
+                    <div class="gift-price">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        ${listing.price} TON
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error updating trade market:', error);
     }
 }
 
@@ -103,4 +158,7 @@ async function listGiftForSale() {
 document.addEventListener('DOMContentLoaded', function() {
     // Отображаем подарки пользователя в коллекции
     displayUserCollectionGifts();
+    
+    // Обновляем Trade Market
+    updateTradeMarket();
 }); 

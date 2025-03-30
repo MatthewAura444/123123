@@ -306,6 +306,24 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
+        // Функция для обновления статистики
+        async function updateStats() {
+            try {
+                // Получаем количество активных продавцов
+                const activeSellers = await tg.CloudStorage.getValue('active_sellers') || 0;
+                document.querySelector('.stat-value:nth-child(1)').textContent = activeSellers;
+
+                // Получаем количество доступных подарков
+                const availableGifts = await tg.CloudStorage.getValue('available_gifts') || 0;
+                document.querySelector('.stat-value:nth-child(2)').textContent = availableGifts;
+
+                // Обновляем каждые 5 секунд
+                setTimeout(updateStats, 5000);
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+
         // Функция для установки активной вкладки
         function setActiveTab(tabId) {
             document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
@@ -328,6 +346,23 @@
             setActiveTab('nft');
         }
 
+        // Функция для обновления счетчиков при создании/продаже подарка
+        async function updateCounters(action) {
+            try {
+                if (action === 'create') {
+                    // Увеличиваем количество доступных подарков
+                    const currentGifts = parseInt(await tg.CloudStorage.getValue('available_gifts')) || 0;
+                    await tg.CloudStorage.setValue('available_gifts', currentGifts + 1);
+                } else if (action === 'sell') {
+                    // Увеличиваем количество активных продавцов
+                    const currentSellers = parseInt(await tg.CloudStorage.getValue('active_sellers')) || 0;
+                    await tg.CloudStorage.setValue('active_sellers', currentSellers + 1);
+                }
+            } catch (error) {
+                console.error('Error updating counters:', error);
+            }
+        }
+
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             // Устанавливаем данные пользователя
@@ -339,12 +374,51 @@
                 }
             }
 
+            // Запускаем обновление статистики
+            updateStats();
+
             // Отображаем подарки пользователя в коллекции
             displayUserCollectionGifts();
             
             // Обновляем Trade Market
             updateTradeMarket();
         });
+
+        // Обработчик создания нового подарка
+        async function showCreateCollectionModal() {
+            try {
+                // ... существующий код создания подарка ...
+                await updateCounters('create');
+            } catch (error) {
+                console.error('Error creating gift:', error);
+            }
+        }
+
+        // Обработчик выставления подарка на продажу
+        async function listGiftForSale() {
+            try {
+                const preview = document.getElementById('selectedGiftPreview');
+                const price = document.getElementById('setPriceInput').value;
+                const description = document.getElementById('setPriceDescription').value;
+
+                if (!price) {
+                    tg.showAlert('Пожалуйста, укажите цену');
+                    return;
+                }
+
+                // Обновляем счетчики
+                await updateCounters('sell');
+
+                // Скрываем модальное окно и показываем Trade Market
+                hideSetPriceModal();
+                showTradeMarket();
+
+                tg.showAlert('Подарок успешно выставлен на продажу!');
+            } catch (error) {
+                console.error('Error listing gift:', error);
+                tg.showAlert('Произошла ошибка при создании объявления');
+            }
+        }
     </script>
     <script src="collections.js"></script>
 </body>

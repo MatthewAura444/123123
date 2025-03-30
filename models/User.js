@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
     telegramId: {
@@ -8,23 +9,13 @@ const userSchema = new mongoose.Schema({
     },
     username: {
         type: String,
-        trim: true
-    },
-    firstName: {
-        type: String,
         required: true
     },
-    lastName: {
-        type: String
-    },
-    photoUrl: {
-        type: String
-    },
-    walletAddress: {
-        type: String,
-        unique: true,
-        sparse: true
-    },
+    firstName: String,
+    lastName: String,
+    avatar: String,
+    bio: String,
+    walletAddress: String,
     balance: {
         type: Number,
         default: 0
@@ -41,60 +32,37 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gift'
     }],
-    following: [{
+    transactions: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    followers: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    totalSales: {
-        type: Number,
-        default: 0
-    },
-    totalPurchases: {
-        type: Number,
-        default: 0
-    },
-    rating: {
-        type: Number,
-        default: 0
-    },
-    reviews: [{
-        from: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        },
-        rating: {
-            type: Number,
-            min: 1,
-            max: 5
-        },
-        comment: String,
-        createdAt: {
-            type: Date,
-            default: Date.now
-        }
+        ref: 'Transaction'
     }],
     settings: {
         notifications: {
             type: Boolean,
             default: true
         },
-        privacy: {
-            type: String,
-            enum: ['public', 'private', 'friends'],
-            default: 'public'
+        darkMode: {
+            type: Boolean,
+            default: false
         }
     },
-    lastActive: {
+    createdAt: {
         type: Date,
         default: Date.now
     }
-}, {
-    timestamps: true
 });
+
+// Хук для хеширования пароля перед сохранением
+userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+});
+
+// Метод для сравнения паролей
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+};
 
 // Индексы для оптимизации поиска
 userSchema.index({ telegramId: 1 });

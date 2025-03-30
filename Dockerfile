@@ -1,31 +1,44 @@
-FROM python:3.11-slim
-
-# Установка Node.js
-RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Этап сборки
+FROM node:16-alpine AS builder
 
 WORKDIR /app
 
-# Копирование файлов зависимостей
+# Копируем файлы зависимостей
 COPY package*.json ./
-COPY requirements.txt ./
 
-# Установка зависимостей
-RUN npm install
-RUN pip install --no-cache-dir -r requirements.txt
+# Устанавливаем зависимости
+RUN npm ci
 
-# Копирование исходного кода
+# Копируем исходный код
 COPY . .
 
-# Создание директории для загрузок
-RUN mkdir -p uploads
+# Собираем приложение
+RUN npm run build
 
+# Этап выполнения
+FROM node:16-alpine
+
+WORKDIR /app
+
+# Копируем файлы зависимостей
+COPY package*.json ./
+
+# Устанавливаем только production зависимости
+RUN npm ci --only=production
+
+# Копируем собранное приложение
+COPY --from=builder /app/dist ./dist
+
+# Копируем конфигурационные файлы
+COPY --from=builder /app/src/config ./src/config
+
+# Создаем пользователя для безопасности
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+# Открываем порты
 EXPOSE 3000
+EXPOSE 8080
 
-# Запуск приложения
-CMD ["node", "server.js"] 
+# Запускаем приложение
+CMD ["node", "dist/index.js"] 

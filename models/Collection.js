@@ -10,11 +10,10 @@ const collectionSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-    coverImage: {
-        type: String,
-        required: true
+    cover: {
+        type: String
     },
-    creator: {
+    owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
@@ -23,44 +22,47 @@ const collectionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gift'
     }],
-    category: {
-        type: String,
-        required: true,
-        enum: ['digital', 'physical', 'art', 'collectibles', 'other']
-    },
-    status: {
-        type: String,
-        enum: ['active', 'archived', 'draft'],
-        default: 'active'
-    },
-    followers: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    totalSales: {
-        type: Number,
-        default: 0
-    },
-    totalVolume: {
-        type: Number,
-        default: 0
+    isPublic: {
+        type: Boolean,
+        default: true
     },
     tags: [{
         type: String,
         trim: true
     }],
-    metadata: {
-        type: Map,
-        of: mongoose.Schema.Types.Mixed
+    stats: {
+        views: {
+            type: Number,
+            default: 0
+        },
+        likes: {
+            type: Number,
+            default: 0
+        },
+        shares: {
+            type: Number,
+            default: 0
+        }
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
-}, {
-    timestamps: true
+});
+
+// Обновление updatedAt при изменении документа
+collectionSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
 });
 
 // Индексы для оптимизации поиска
 collectionSchema.index({ name: 'text', description: 'text', tags: 'text' });
-collectionSchema.index({ creator: 1, status: 1 });
-collectionSchema.index({ category: 1, status: 1 });
+collectionSchema.index({ owner: 1, isPublic: 1 });
 
 const Collection = mongoose.model('Collection', collectionSchema);
 

@@ -1,225 +1,136 @@
-# HLS Player для Telegram-iOS
+# Telegram Gifts Marketplace
 
-HLS плеер, реализованный на Swift для интеграции с Telegram iOS. Поддерживает воспроизведение HLS потоков с адаптивным качеством, аудио дорожками и субтитрами.
-
-## О конкурсе
-
-Этот проект создан для участия в конкурсе Telegram iOS 2024:
-- Призовой фонд: 50 000 долларов США
-- Крайний срок: 23:59 25 октября (по дубайскому времени)
-- Результаты: ноябрь 2024 г.
-
-### Требования конкурса
-- Замена AVPlayer в Telegram-iOS
-- Поддержка HLS для аудио и видео
-- Автоматическое и ручное переключение качества
-- Запрет на использование веб-представлений
-- Использование hls.js как справочного материала
-- Поддержка iOS 12 - iOS 18
+Платформа для продажи и покупки подарков через Telegram с поддержкой TON.
 
 ## Возможности
 
-- Поддержка HLS (HTTP Live Streaming)
-- Адаптивное качество видео
-- Поддержка аудио дорожек
-- Поддержка субтитров
-- Управление буфером
-- Мониторинг сети
-- Шифрование (AES-128)
-- Логирование
-- Интеграция с AsyncDisplayKit
-- Поддержка iOS 12+
+- Создание и управление коллекциями подарков
+- Загрузка и продажа цифровых и физических подарков
+- Поддержка 3D моделей
+- Интеграция с TON для платежей
+- Система рейтингов и отзывов
+- WebSocket уведомления в реальном времени
+- Адаптивный дизайн
+- Поддержка темной темы
 
-## Требования
+## Технологии
 
-- iOS 12.0+
-- Xcode 12.0+
-- Swift 5.0+
-- AsyncDisplayKit
-- AVFoundation
-- Network.framework
+- Node.js
+- Express
+- MongoDB
+- WebSocket
+- TON Connect
+- React
+- Tailwind CSS
 
 ## Установка
 
-1. Добавьте файл `HLSPlayer.swift` в ваш проект
-2. Убедитесь, что все необходимые зависимости подключены
-3. Импортируйте модуль в нужные файлы:
-
-```swift
-import Foundation
-import AVFoundation
-import Network
-import AsyncDisplayKit
+1. Клонируйте репозиторий:
+```bash
+git clone https://github.com/your-username/telegram-gifts.git
+cd telegram-gifts
 ```
 
-## Интеграция с Telegram-iOS
-
-### 1. Замена существующего HLSVideoContent
-
-```swift
-// В файле HLSVideoContent.swift
-final class HLSVideoContent: VideoContent {
-    private let player: HLSPlayer
-    private let videoNode: ASVideoNode
-    
-    init(url: URL) {
-        self.player = HLSPlayer()
-        self.videoNode = ASVideoNode()
-        
-        setupVideoNode()
-        player.loadSource(url)
-    }
-    
-    // ... остальной код ...
-}
+2. Установите зависимости:
+```bash
+npm install
 ```
 
-### 2. Настройка зависимостей
-
-В `Package.swift` добавьте:
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/TelegramMessenger/AsyncDisplayKit.git", from: "3.0.0")
-]
+3. Создайте файл .env:
+```env
+BOT_TOKEN=your_telegram_bot_token
+MONGODB_URI=mongodb://localhost:27017/telegram-gifts
+PORT=3000
+WS_PORT=8080
+JWT_SECRET=your_jwt_secret
 ```
 
-### 3. Тестирование
-
-Для тестирования можно использовать HLS потоки из канала @hls_samples:
-- Тестовые потоки с разным качеством
-- Потоки с аудио дорожками
-- Потоки с субтитрами
-- Шифрованные потоки
-
-## Использование
-
-### Базовое использование
-
-```swift
-// Создание плеера
-let player = HLSPlayer()
-
-// Загрузка источника
-let url = URL(string: "https://example.com/stream.m3u8")!
-player.loadSource(url)
-
-// Управление воспроизведением
-player.play()
-player.pause()
-player.seek(to: 30.0) // Перемотка на 30 секунд
-
-// Управление качеством
-player.setQuality(1) // Переключение на второй уровень качества
+4. Запустите сервер:
+```bash
+npm run dev
 ```
 
-### Интеграция с AsyncDisplayKit
+## API Endpoints
 
-```swift
-// Создание видео контента
-let videoContent = HLSVideoContent(url: streamURL)
+### Аутентификация
+- POST /api/auth/register - Регистрация
+- POST /api/auth/login - Вход
+- GET /api/auth/profile - Получение профиля
+- PUT /api/auth/profile - Обновление профиля
+- PUT /api/auth/avatar - Обновление аватара
 
-// Создание видео ноды
-let videoNode = ASVideoNode()
+### Коллекции
+- POST /api/collections - Создание коллекции
+- GET /api/collections - Получение списка коллекций
+- GET /api/collections/:id - Получение коллекции
+- PUT /api/collections/:id - Обновление коллекции
+- DELETE /api/collections/:id - Удаление коллекции
 
-// Прикрепление контента к ноде
-videoContent.attach(videoNode)
+### Подарки
+- POST /api/gifts - Создание подарка
+- GET /api/gifts - Получение списка подарков
+- GET /api/gifts/:id - Получение подарка
+- PUT /api/gifts/:id - Обновление подарка
+- DELETE /api/gifts/:id - Удаление подарка
 
-// Управление воспроизведением
-videoContent.play()
-videoContent.pause()
-videoContent.seek(to: 30.0)
-videoContent.setVolume(0.5)
+### Транзакции
+- POST /api/transactions - Создание транзакции
+- GET /api/transactions - Получение списка транзакций
+- GET /api/transactions/:id - Получение транзакции
+- PUT /api/transactions/:id/status - Обновление статуса транзакции
+- GET /api/transactions/stats - Получение статистики транзакций
+
+## WebSocket Events
+
+### События подарков
+- NEW_GIFT - Новый подарок
+- GIFT_UPDATED - Подарок обновлен
+- GIFT_DELETED - Подарок удален
+
+### События коллекций
+- NEW_COLLECTION - Новая коллекция
+- COLLECTION_UPDATED - Коллекция обновлена
+- COLLECTION_DELETED - Коллекция удалена
+
+### События транзакций
+- NEW_TRANSACTION - Новая транзакция
+- TRANSACTION_UPDATED - Транзакция обновлена
+
+### События отзывов
+- NEW_REVIEW - Новый отзыв
+
+### События пользователей
+- USER_STATUS - Статус пользователя
+
+## Разработка
+
+### Структура проекта
+```
+telegram-gifts/
+├── public/
+│   ├── css/
+│   ├── js/
+│   └── images/
+├── src/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middleware/
+│   └── websocket/
+├── uploads/
+│   ├── images/
+│   └── models/
+├── .env
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
-## Тестовые сценарии
-
-### 1. Переключение качества
-```swift
-// Автоматическое переключение
-player.networkController.startMonitoring()
-
-// Ручное переключение
-player.setQuality(2) // Переключение на третий уровень качества
-```
-
-### 2. Аудио дорожки
-```swift
-// Получение доступных дорожек
-let tracks = player.audioTrackController.tracks
-
-// Переключение дорожки
-player.audioTrackController.setCurrentTrack(1)
-```
-
-### 3. Субтитры
-```swift
-// Получение доступных субтитров
-let subtitles = player.subtitleController.tracks
-
-// Переключение субтитров
-player.subtitleController.setCurrentTrack(0)
-```
-
-### 4. Обработка ошибок
-```swift
-// Логирование ошибок
-player.errorController.addError(.networkError("Connection lost"))
-
-// Очистка ошибок
-player.errorController.clear()
-```
-
-## Архитектура
-
-Плеер состоит из следующих основных компонентов:
-
-### Контроллеры
-
-- `HLSParser` - парсинг HLS плейлистов
-- `NetworkController` - мониторинг сети
-- `BufferController` - управление буфером
-- `SegmentController` - управление сегментами
-- `KeyController` - управление ключами шифрования
-- `AudioTrackController` - управление аудио дорожками
-- `SubtitleController` - управление субтитрами
-- `ErrorController` - обработка ошибок
-- `PlayerStateController` - управление состоянием плеера
-
-### Модели
-
-- `HLSStream` - информация о потоке
-- `HLSSegment` - информация о сегменте
-- `HLSKey` - информация о ключе шифрования
-- `HLSMap` - информация о карте сегмента
-- `HLSTrack` - информация о дорожке (аудио/субтитры)
-
-## Логирование
-
-Плеер использует системный логгер iOS (`os.log`). Логи можно просматривать в Console.app или через Xcode Console.
-
-## Обработка ошибок
-
-Все ошибки обрабатываются через `ErrorController` и логируются. Основные типы ошибок:
-
-- `invalidURL` - неверный URL
-- `networkError` - ошибки сети
-- `parseError` - ошибки парсинга
-- `bufferError` - ошибки буфера
-- `playbackError` - ошибки воспроизведения
-- `keyError` - ошибки ключей
-- `segmentError` - ошибки сегментов
-
-## Тестирование производительности
-
-Для тестирования производительности рекомендуется:
-
-1. Проверить потребление памяти
-2. Измерить время загрузки сегментов
-3. Проверить плавность переключения качества
-4. Протестировать работу в условиях слабой сети
-5. Проверить стабильность воспроизведения
+### Скрипты
+- `npm start` - Запуск сервера
+- `npm run dev` - Запуск сервера в режиме разработки
+- `npm test` - Запуск тестов
 
 ## Лицензия
 
-MIT License 
+MIT 

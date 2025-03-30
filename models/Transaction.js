@@ -16,43 +16,58 @@ const transactionSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    amount: {
+    price: {
         type: Number,
         required: true,
         min: 0
-    },
-    currency: {
-        type: String,
-        default: 'TON'
     },
     status: {
         type: String,
         enum: ['pending', 'completed', 'failed', 'cancelled'],
         default: 'pending'
     },
-    transactionHash: {
+    type: {
         type: String,
-        unique: true,
-        sparse: true
+        enum: ['purchase', 'transfer', 'refund'],
+        required: true
     },
     paymentMethod: {
         type: String,
-        enum: ['TON', 'TON_WALLET', 'CRYPTO'],
+        enum: ['ton', 'credit_card', 'bank_transfer'],
         required: true
+    },
+    paymentDetails: {
+        transactionId: String,
+        paymentAddress: String,
+        paymentAmount: Number,
+        paymentCurrency: String,
+        paymentTimestamp: Date
     },
     metadata: {
         type: Map,
         of: mongoose.Schema.Types.Mixed
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
-}, {
-    timestamps: true
+});
+
+// Обновление updatedAt при изменении документа
+transactionSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
 });
 
 // Индексы для оптимизации поиска
 transactionSchema.index({ gift: 1, status: 1 });
 transactionSchema.index({ seller: 1, status: 1 });
 transactionSchema.index({ buyer: 1, status: 1 });
-transactionSchema.index({ transactionHash: 1 });
+transactionSchema.index({ createdAt: -1 });
 
 // Методы для работы с транзакциями
 transactionSchema.methods.complete = async function(transactionHash) {

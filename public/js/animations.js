@@ -1,172 +1,241 @@
 class AnimationManager {
     constructor() {
         this.animations = new Map();
+        this.intersectionObserver = null;
         this.init();
     }
 
     init() {
-        // Инициализируем анимации при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            this.initializeAnimations();
-            this.observeElements();
-        });
-    }
-
-    initializeAnimations() {
-        // Добавляем анимации для карточек подарков
-        this.addAnimation('.gift-card', {
-            enter: 'fadeInUp',
-            hover: 'scaleUp',
-            exit: 'fadeOutDown'
-        });
-
-        // Добавляем анимации для карточек коллекций
-        this.addAnimation('.collection-card', {
-            enter: 'fadeInUp',
-            hover: 'scaleUp',
-            exit: 'fadeOutDown'
-        });
-
-        // Добавляем анимации для статистики
-        this.addAnimation('.stat-card', {
-            enter: 'fadeInLeft',
-            hover: 'scaleUp'
-        });
-
-        // Добавляем анимации для кнопок
-        this.addAnimation('.btn', {
-            hover: 'scaleUp',
-            click: 'scaleDown'
-        });
-
-        // Добавляем анимации для модальных окон
-        this.addAnimation('.modal', {
-            enter: 'fadeIn',
-            exit: 'fadeOut'
-        });
-
-        // Добавляем анимации для форм
-        this.addAnimation('.form-group', {
-            enter: 'slideInRight'
-        });
-    }
-
-    addAnimation(selector, animations) {
-        this.animations.set(selector, animations);
-    }
-
-    observeElements() {
-        // Создаем Intersection Observer для анимаций при появлении элементов
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const element = entry.target;
-                    const animations = this.animations.get(element.className);
-                    if (animations && animations.enter) {
-                        this.animate(element, animations.enter);
+        // Инициализируем Intersection Observer для анимаций при прокрутке
+        this.intersectionObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const element = entry.target;
+                        const animation = element.dataset.animation;
+                        if (animation) {
+                            this.playAnimation(element, animation);
+                        }
                     }
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
+                });
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '50px'
+            }
+        );
 
-        // Наблюдаем за всеми элементами с анимациями
-        this.animations.forEach((animations, selector) => {
-            document.querySelectorAll(selector).forEach(element => {
-                observer.observe(element);
-            });
-        });
+        // Добавляем обработчики для анимаций при наведении
+        document.addEventListener('mouseover', this.handleHoverAnimation.bind(this));
     }
 
-    animate(element, animation, duration = 300) {
-        // Добавляем класс анимации
-        element.classList.add(`animate-${animation}`);
-
-        // Удаляем класс анимации после завершения
-        setTimeout(() => {
-            element.classList.remove(`animate-${animation}`);
-        }, duration);
+    // Анимации появления элементов
+    animateElementEnter(element, animation = 'fadeIn') {
+        element.dataset.animation = animation;
+        this.intersectionObserver.observe(element);
     }
 
-    // Анимации для карточек
-    animateCardEnter(card) {
-        this.animate(card, 'fadeInUp');
+    // Анимации при наведении
+    handleHoverAnimation(event) {
+        const element = event.target;
+        const hoverAnimation = element.dataset.hoverAnimation;
+        
+        if (hoverAnimation && !this.animations.has(element)) {
+            this.playHoverAnimation(element, hoverAnimation);
+        }
     }
 
-    animateCardHover(card) {
-        this.animate(card, 'scaleUp');
+    // Воспроизведение анимации
+    playAnimation(element, animation) {
+        const keyframes = this.getKeyframes(animation);
+        if (!keyframes) return;
+
+        const animationName = `${animation}_${Date.now()}`;
+        const style = document.createElement('style');
+        
+        style.textContent = `
+            @keyframes ${animationName} {
+                ${keyframes}
+            }
+        `;
+        
+        document.head.appendChild(style);
+        
+        element.style.animation = `${animationName} 0.6s ease forwards`;
+        
+        element.addEventListener('animationend', () => {
+            style.remove();
+            element.style.animation = '';
+        }, { once: true });
     }
 
-    animateCardExit(card) {
-        this.animate(card, 'fadeOutDown');
+    // Воспроизведение анимации при наведении
+    playHoverAnimation(element, animation) {
+        const keyframes = this.getHoverKeyframes(animation);
+        if (!keyframes) return;
+
+        const animationName = `hover_${animation}_${Date.now()}`;
+        const style = document.createElement('style');
+        
+        style.textContent = `
+            @keyframes ${animationName} {
+                ${keyframes}
+            }
+        `;
+        
+        document.head.appendChild(style);
+        
+        element.style.animation = `${animationName} 0.3s ease forwards`;
+        
+        element.addEventListener('animationend', () => {
+            style.remove();
+            element.style.animation = '';
+        }, { once: true });
     }
 
-    // Анимации для кнопок
-    animateButtonHover(button) {
-        this.animate(button, 'scaleUp');
+    // Получение keyframes для анимации
+    getKeyframes(animation) {
+        const keyframes = {
+            fadeIn: `
+                0% { opacity: 0; }
+                100% { opacity: 1; }
+            `,
+            slideUp: `
+                0% { transform: translateY(20px); opacity: 0; }
+                100% { transform: translateY(0); opacity: 1; }
+            `,
+            slideDown: `
+                0% { transform: translateY(-20px); opacity: 0; }
+                100% { transform: translateY(0); opacity: 1; }
+            `,
+            slideLeft: `
+                0% { transform: translateX(20px); opacity: 0; }
+                100% { transform: translateX(0); opacity: 1; }
+            `,
+            slideRight: `
+                0% { transform: translateX(-20px); opacity: 0; }
+                100% { transform: translateX(0); opacity: 1; }
+            `,
+            scaleIn: `
+                0% { transform: scale(0.9); opacity: 0; }
+                100% { transform: scale(1); opacity: 1; }
+            `,
+            rotateIn: `
+                0% { transform: rotate(-180deg) scale(0); opacity: 0; }
+                100% { transform: rotate(0) scale(1); opacity: 1; }
+            `,
+            bounceIn: `
+                0% { transform: scale(0.3); opacity: 0; }
+                50% { transform: scale(1.05); opacity: 0.8; }
+                70% { transform: scale(0.9); opacity: 0.9; }
+                100% { transform: scale(1); opacity: 1; }
+            `
+        };
+
+        return keyframes[animation];
     }
 
-    animateButtonClick(button) {
-        this.animate(button, 'scaleDown');
+    // Получение keyframes для анимации при наведении
+    getHoverKeyframes(animation) {
+        const keyframes = {
+            scale: `
+                0% { transform: scale(1); }
+                100% { transform: scale(1.05); }
+            `,
+            lift: `
+                0% { transform: translateY(0); }
+                100% { transform: translateY(-5px); }
+            `,
+            glow: `
+                0% { box-shadow: 0 0 0 rgba(var(--primary-color-rgb), 0); }
+                100% { box-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.5); }
+            `,
+            pulse: `
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            `,
+            shake: `
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            `
+        };
+
+        return keyframes[animation];
     }
 
-    // Анимации для модальных окон
+    // Анимация для карточек статистики
+    animateStatCardEnter(card) {
+        this.animateElementEnter(card, 'slideUp');
+    }
+
+    // Анимация для элементов списка
+    animateListItemEnter(item, delay = 0) {
+        item.style.animationDelay = `${delay}s`;
+        this.animateElementEnter(item, 'slideLeft');
+    }
+
+    // Анимация для модальных окон
     animateModalEnter(modal) {
-        this.animate(modal, 'fadeIn');
+        this.animateElementEnter(modal, 'scaleIn');
     }
 
-    animateModalExit(modal) {
-        this.animate(modal, 'fadeOut');
+    // Анимация для уведомлений
+    animateNotificationEnter(notification) {
+        this.animateElementEnter(notification, 'slideRight');
     }
 
-    // Анимации для форм
-    animateFormGroupEnter(formGroup) {
-        this.animate(formGroup, 'slideInRight');
+    // Анимация для кнопок
+    animateButtonEnter(button) {
+        this.animateElementEnter(button, 'bounceIn');
     }
 
-    // Анимации для статистики
-    animateStatCardEnter(statCard) {
-        this.animate(statCard, 'fadeInLeft');
+    // Анимация для изображений
+    animateImageEnter(image) {
+        this.animateElementEnter(image, 'fadeIn');
     }
 
-    animateStatCardHover(statCard) {
-        this.animate(statCard, 'scaleUp');
+    // Анимация для заголовков
+    animateHeadingEnter(heading) {
+        this.animateElementEnter(heading, 'slideDown');
     }
 
-    // Анимации для уведомлений
-    animateNotification(notification) {
-        // Добавляем класс для анимации появления
-        notification.classList.add('notification-enter');
+    // Анимация для форм
+    animateFormEnter(form) {
+        this.animateElementEnter(form, 'fadeIn');
     }
 
-    // Анимации для загрузки
+    // Анимация для навигации
+    animateNavEnter(nav) {
+        this.animateElementEnter(nav, 'slideDown');
+    }
+
+    // Анимация для футера
+    animateFooterEnter(footer) {
+        this.animateElementEnter(footer, 'fadeIn');
+    }
+
+    // Анимация для загрузки
     animateLoading(element) {
-        element.classList.add('animate-pulse');
+        element.style.animation = 'spin 1s linear infinite';
     }
 
-    stopLoading(element) {
-        element.classList.remove('animate-pulse');
-    }
-
-    // Анимации для переходов между страницами
-    animatePageTransition(fromPage, toPage) {
-        this.animate(fromPage, 'fadeOut');
-        setTimeout(() => {
-            this.animate(toPage, 'fadeIn');
-        }, 300);
-    }
-
-    // Анимации для ошибок
-    animateError(element) {
-        this.animate(element, 'shake');
-    }
-
-    // Анимации для успешных действий
-    animateSuccess(element) {
-        this.animate(element, 'bounce');
+    // Остановка анимации загрузки
+    stopLoadingAnimation(element) {
+        element.style.animation = '';
     }
 }
 
-// Создаем глобальный экземпляр
-window.animationManager = new AnimationManager(); 
+// Создаем глобальный экземпляр менеджера анимаций
+window.animationManager = new AnimationManager();
+
+// Добавляем стили для анимации загрузки
+const loadingStyle = document.createElement('style');
+loadingStyle.textContent = `
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(loadingStyle); 

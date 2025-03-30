@@ -307,20 +307,39 @@
         tg.expand();
 
         // Функция для обновления статистики
-        async function updateStats() {
+        function updateStats() {
             try {
                 // Получаем количество активных продавцов
-                const activeSellers = await tg.CloudStorage.getValue('active_sellers') || 0;
-                document.querySelector('.stat-value:nth-child(1)').textContent = activeSellers;
+                const activeSellers = parseInt(localStorage.getItem('active_sellers')) || 0;
+                document.querySelectorAll('.stat-value')[0].textContent = activeSellers;
 
                 // Получаем количество доступных подарков
-                const availableGifts = await tg.CloudStorage.getValue('available_gifts') || 0;
-                document.querySelector('.stat-value:nth-child(2)').textContent = availableGifts;
+                const availableGifts = parseInt(localStorage.getItem('available_gifts')) || 0;
+                document.querySelectorAll('.stat-value')[1].textContent = availableGifts;
 
                 // Обновляем каждые 5 секунд
                 setTimeout(updateStats, 5000);
             } catch (error) {
                 console.error('Error updating stats:', error);
+            }
+        }
+
+        // Функция для обновления счетчиков при создании/продаже подарка
+        function updateCounters(action) {
+            try {
+                if (action === 'create') {
+                    // Увеличиваем количество доступных подарков
+                    const currentGifts = parseInt(localStorage.getItem('available_gifts')) || 0;
+                    localStorage.setItem('available_gifts', currentGifts + 1);
+                } else if (action === 'sell') {
+                    // Увеличиваем количество активных продавцов
+                    const currentSellers = parseInt(localStorage.getItem('active_sellers')) || 0;
+                    localStorage.setItem('active_sellers', currentSellers + 1);
+                }
+                // Сразу обновляем отображение
+                updateStats();
+            } catch (error) {
+                console.error('Error updating counters:', error);
             }
         }
 
@@ -346,25 +365,16 @@
             setActiveTab('nft');
         }
 
-        // Функция для обновления счетчиков при создании/продаже подарка
-        async function updateCounters(action) {
-            try {
-                if (action === 'create') {
-                    // Увеличиваем количество доступных подарков
-                    const currentGifts = parseInt(await tg.CloudStorage.getValue('available_gifts')) || 0;
-                    await tg.CloudStorage.setValue('available_gifts', currentGifts + 1);
-                } else if (action === 'sell') {
-                    // Увеличиваем количество активных продавцов
-                    const currentSellers = parseInt(await tg.CloudStorage.getValue('active_sellers')) || 0;
-                    await tg.CloudStorage.setValue('active_sellers', currentSellers + 1);
-                }
-            } catch (error) {
-                console.error('Error updating counters:', error);
-            }
-        }
-
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
+            // Устанавливаем начальные значения, если они еще не установлены
+            if (!localStorage.getItem('active_sellers')) {
+                localStorage.setItem('active_sellers', '0');
+            }
+            if (!localStorage.getItem('available_gifts')) {
+                localStorage.setItem('available_gifts', '0');
+            }
+
             // Устанавливаем данные пользователя
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
@@ -385,17 +395,19 @@
         });
 
         // Обработчик создания нового подарка
-        async function showCreateCollectionModal() {
+        function showCreateCollectionModal() {
             try {
                 // ... существующий код создания подарка ...
-                await updateCounters('create');
+                updateCounters('create');
+                tg.showAlert('Подарок успешно создан!');
             } catch (error) {
                 console.error('Error creating gift:', error);
+                tg.showAlert('Произошла ошибка при создании подарка');
             }
         }
 
         // Обработчик выставления подарка на продажу
-        async function listGiftForSale() {
+        function listGiftForSale() {
             try {
                 const preview = document.getElementById('selectedGiftPreview');
                 const price = document.getElementById('setPriceInput').value;
@@ -407,7 +419,7 @@
                 }
 
                 // Обновляем счетчики
-                await updateCounters('sell');
+                updateCounters('sell');
 
                 // Скрываем модальное окно и показываем Trade Market
                 hideSetPriceModal();

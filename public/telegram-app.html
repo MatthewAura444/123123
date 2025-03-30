@@ -1406,6 +1406,45 @@
                 </div>
             </div>
         </div>
+
+        <!-- Модальное окно создания подарка -->
+        <div class="gift-modal" id="giftModal">
+            <div class="gift-modal-content">
+                <div class="gift-modal-header">
+                    <h2>Create New Gift</h2>
+                    <button class="close-modal">×</button>
+                </div>
+                <div class="gift-modal-body">
+                    <form id="gift-form">
+                        <div class="form-group">
+                            <label>Gift Name</label>
+                            <input type="text" name="giftName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Gift Model</label>
+                            <input type="text" name="giftModel" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Background</label>
+                            <input type="file" name="background" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label>Pattern</label>
+                            <input type="file" name="pattern" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label>Gift Photos</label>
+                            <input type="file" name="giftPhotos" accept="image/*" multiple>
+                        </div>
+                        <div class="form-group">
+                            <label>Price (TON)</label>
+                            <input type="number" name="price" required min="0" step="0.1">
+                        </div>
+                        <button type="submit" class="submit-btn">Create Gift</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1471,60 +1510,14 @@
 
         // Функция для создания нового подарка
         function createNewGift() {
-            const modal = document.createElement('div');
-            modal.className = 'gift-modal active';
-            modal.innerHTML = `
-                <div class="gift-modal-content">
-                    <div class="gift-modal-header">
-                        <h2>Create New Gift</h2>
-                        <button class="close-modal">×</button>
-                    </div>
-                    <div class="gift-modal-body">
-                        <form id="gift-form">
-                            <div class="form-group">
-                                <label>Gift Name</label>
-                                <input type="text" name="giftName" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Gift Model</label>
-                                <input type="text" name="giftModel" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Background</label>
-                                <input type="file" name="background" accept="image/*">
-                            </div>
-                            <div class="form-group">
-                                <label>Pattern</label>
-                                <input type="file" name="pattern" accept="image/*">
-                            </div>
-                            <div class="form-group">
-                                <label>Gift Photos</label>
-                                <input type="file" name="giftPhotos" accept="image/*" multiple>
-                            </div>
-                            <div class="form-group">
-                                <label>Price (TON)</label>
-                                <input type="number" name="price" required min="0" step="0.1">
-                            </div>
-                            <button type="submit" class="submit-btn">Create Gift</button>
-                        </form>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+            const modal = document.getElementById('giftModal');
+            modal.classList.add('active');
+        }
 
-            // Обработчик закрытия модального окна
-            modal.querySelector('.close-modal').addEventListener('click', () => {
-                modal.remove();
-            });
-
-            // Обработчик отправки формы
-            modal.querySelector('#gift-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                // Здесь будет логика отправки данных на сервер
-                console.log('Gift data:', Object.fromEntries(formData));
-                modal.remove();
-            });
+        // Функция для скрытия модального окна создания подарка
+        function hideGiftModal() {
+            const modal = document.getElementById('giftModal');
+            modal.classList.remove('active');
         }
 
         // Функция для установки активного таба
@@ -1678,6 +1671,39 @@
             const createCollectionBtn = document.querySelector('.action-card');
             if (createCollectionBtn) {
                 createCollectionBtn.addEventListener('click', createNewGift);
+            }
+
+            // Обработчик для формы создания подарка
+            const giftForm = document.getElementById('gift-form');
+            if (giftForm) {
+                giftForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const giftData = {
+                        name: formData.get('giftName'),
+                        model: formData.get('giftModel'),
+                        price: formData.get('price'),
+                        background: formData.get('background'),
+                        pattern: formData.get('pattern'),
+                        photos: formData.getAll('giftPhotos')
+                    };
+
+                    // Здесь будет логика отправки данных на сервер
+                    console.log('Gift data:', giftData);
+                    
+                    // Закрываем модальное окно
+                    hideGiftModal();
+                    
+                    // Очищаем форму
+                    this.reset();
+                });
+            }
+
+            // Обработчик для закрытия модального окна
+            const closeModalBtn = document.querySelector('.gift-modal .close-modal');
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', hideGiftModal);
             }
 
             // Устанавливаем начальный активный таб

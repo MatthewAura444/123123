@@ -7,14 +7,16 @@ let modalClose = document.querySelector('.modal-close');
 let payButton = document.getElementById('payButton');
 let starsAmount = document.getElementById('starsAmount');
 let paymentAmount = document.getElementById('paymentAmount');
+let recipientInput = document.getElementById('recipientInput');
 
-// Цены на Stars
+// Цены на Stars (с fragment.com)
 const STAR_PRICES = {
-    100: 0.5,   // 100 Stars за 0.5 TON
-    500: 2.0,   // 500 Stars за 2.0 TON
-    1000: 3.5,  // 1000 Stars за 3.5 TON
-    2000: 6.0,  // 2000 Stars за 6.0 TON
-    5000: 14.0  // 5000 Stars за 14.0 TON
+    100: 0.5,    // 100 Stars за 0.5 TON
+    500: 2.0,    // 500 Stars за 2.0 TON
+    1000: 3.5,   // 1000 Stars за 3.5 TON
+    2000: 6.0,   // 2000 Stars за 6.0 TON
+    5000: 14.0,  // 5000 Stars за 14.0 TON
+    10000: 25.0  // 10000 Stars за 25.0 TON
 };
 
 // Инициализация приложения
@@ -409,6 +411,12 @@ function closePaymentModal() {
 // Обработка оплаты
 async function handlePayment() {
     try {
+        const recipient = recipientInput.value.trim();
+        if (!recipient) {
+            alert('Пожалуйста, укажите получателя Stars');
+            return;
+        }
+
         // Отправка данных на сервер
         const response = await fetch('/api/payment', {
             method: 'POST',
@@ -418,7 +426,8 @@ async function handlePayment() {
             body: JSON.stringify({
                 amount: parseInt(starsAmount.textContent),
                 price: parseFloat(paymentAmount.textContent),
-                user_id: tg.initDataUnsafe.user.id
+                user_id: tg.initDataUnsafe.user.id,
+                recipient: recipient
             })
         });
         
@@ -433,11 +442,15 @@ async function handlePayment() {
             type: 'payment',
             payment_id: data.payment_id,
             amount: data.amount,
-            price: data.price
+            price: data.price,
+            recipient: recipient
         }));
         
         // Закрытие модального окна
         closePaymentModal();
+        
+        // Очистка поля получателя
+        recipientInput.value = '';
         
     } catch (error) {
         console.error('Ошибка при обработке платежа:', error);

@@ -15,11 +15,16 @@ WEBAPP_URL = "https://matthewaura444.github.io/123123/"  # URL вашего ра
 # Настройки комиссии
 COMMISSION_RATE = 0.02  # 2% комиссия
 
-# Настройки Stars
+# Настройки Stars (цены с fragment.com)
 STAR_PRICES = {
-    100: 0.5,   # 100 Stars за 0.5 TON
-    500: 2.0,   # 500 Stars за 2.0 TON
-    1000: 3.5,  # 1000 Stars за 3.5 TON
-    2000: 6.0,  # 2000 Stars за 6.0 TON
-    5000: 14.0  # 5000 Stars за 14.0 TON
-} 
+    100: 0.5,    # 100 Stars за 0.5 TON
+    500: 2.0,    # 500 Stars за 2.0 TON
+    1000: 3.5,   # 1000 Stars за 3.5 TON
+    2000: 6.0,   # 2000 Stars за 6.0 TON
+    5000: 14.0,  # 5000 Stars за 14.0 TON
+    10000: 25.0  # 10000 Stars за 25.0 TON
+}
+
+# Настройки Fragment API
+FRAGMENT_API_URL = "https://fragment.com/api"
+FRAGMENT_API_KEY = ""  # Здесь нужно будет указать API ключ от Fragment 

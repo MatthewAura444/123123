@@ -131,6 +131,34 @@ header p {
     font-size: 1.1em;
 }
 
+/* Поле ввода получателя */
+.recipient-info {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.recipient-info label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.recipient-info input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.2s;
+}
+
+.recipient-info input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
 /* Кнопки */
 .primary-button {
     background-color: var(--primary-color);

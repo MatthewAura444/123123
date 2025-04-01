@@ -1,6 +1,0 @@
-version: 2
-authtoken: 2uwkQjKv0DdsMGvcHztwJjtdo90_6ZVGgnsjRMczvf2B4mMPH
-tunnels:
-  gift-app:
-    proto: http
-    addr: 3000 

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="400" height="400" fill="#2481cc" fill-opacity="0.1"/>
-    <path d="M200 100C200 100 240 140 240 180C240 220 220 260 200 260C180 260 160 220 160 180C160 140 200 100 200 100Z" fill="#2481cc"/>
-    <path d="M200 100C200 100 220 120 220 140C220 160 210 180 200 180C190 180 180 160 180 140C180 120 200 100 200 100Z" fill="#2481cc" fill-opacity="0.7"/>
-    <path d="M200 180C200 180 220 200 220 220C220 240 210 260 200 260C190 260 180 240 180 220C180 200 200 180 200 180Z" fill="#2481cc" fill-opacity="0.5"/>
-</svg> 

@@ -1,6 +1,21 @@
 // Инициализация Telegram WebApp
 let tg = window.Telegram.WebApp;
 let currentOrder = null;
+let starsGrid = document.querySelector('.stars-grid');
+let paymentModal = document.getElementById('paymentModal');
+let modalClose = document.querySelector('.modal-close');
+let payButton = document.getElementById('payButton');
+let starsAmount = document.getElementById('starsAmount');
+let paymentAmount = document.getElementById('paymentAmount');
+
+// Цены на Stars
+const STAR_PRICES = {
+    100: 0.5,   // 100 Stars за 0.5 TON
+    500: 2.0,   // 500 Stars за 2.0 TON
+    1000: 3.5,  // 1000 Stars за 3.5 TON
+    2000: 6.0,  // 2000 Stars за 6.0 TON
+    5000: 14.0  // 5000 Stars за 14.0 TON
+};
 
 // Инициализация приложения
 async function initApp() {
@@ -202,10 +217,17 @@ function showError(message) {
 }
 
 // Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
+    // Инициализация Telegram WebApp
     tg.expand();
-    loadUserStats();
-    initializeStarsGrid();
+    tg.ready();
+    
+    // Загрузка Stars
+    loadStars();
+    
+    // Обработчики событий
+    modalClose.addEventListener('click', closePaymentModal);
+    payButton.addEventListener('click', handlePayment);
 });
 
 // Обработчики событий Telegram
@@ -342,112 +364,90 @@ async function loadUserStats() {
     }
 }
 
-// Инициализация сетки Stars
-function initializeStarsGrid() {
-    const starsGrid = document.getElementById('stars-grid');
-    const starOptions = [
-        { amount: 100, price: 0.5 },
-        { amount: 500, price: 2.0 },
-        { amount: 1000, price: 3.5 },
-        { amount: 2000, price: 6.0 },
-        { amount: 5000, price: 14.0 }
-    ];
-
-    starOptions.forEach(option => {
-        const starCard = createStarCard(option);
-        starsGrid.appendChild(starCard);
+// Загрузка Stars
+function loadStars() {
+    // Очистка сетки
+    starsGrid.innerHTML = '';
+    
+    // Создание карточек Stars
+    Object.entries(STAR_PRICES).forEach(([amount, price]) => {
+        const card = createStarCard(amount, price);
+        starsGrid.appendChild(card);
     });
 }
 
-// Создание карточки Stars
-function createStarCard(option) {
+// Создание карточки Star
+function createStarCard(amount, price) {
     const card = document.createElement('div');
     card.className = 'star-card';
-    card.onclick = () => showPaymentModal(option);
-
     card.innerHTML = `
-        <div class="star-icon"></div>
-        <div class="star-info">
-            <div class="star-amount">${option.amount} Stars</div>
-            <div class="star-price">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-                ${option.price} TON
-            </div>
-            <button class="buy-button">Buy Now</button>
-        </div>
+        <h3>${amount} Stars</h3>
+        <div class="price">${price} TON</div>
+        <button class="primary-button">Купить</button>
     `;
-
+    
+    // Обработчик клика
+    card.addEventListener('click', () => {
+        openPaymentModal(amount, price);
+    });
+    
     return card;
 }
 
-// Показ модального окна оплаты
-function showPaymentModal(option) {
-    const modal = document.getElementById('payment-modal');
-    const amountElement = document.getElementById('payment-amount');
-    const commission = option.price * 0.02; // 2% комиссия
-    const totalAmount = option.price + commission;
-
-    currentOrder = {
-        amount: option.amount,
-        price_per_star: option.price,
-        total_price: option.price,
-        commission: commission,
-        final_price: totalAmount
-    };
-
-    amountElement.textContent = totalAmount.toFixed(2);
-    modal.style.display = 'flex';
+// Открытие модального окна оплаты
+function openPaymentModal(amount, price) {
+    starsAmount.textContent = amount;
+    paymentAmount.textContent = `${price} TON`;
+    paymentModal.style.display = 'block';
 }
 
-// Закрытие модального окна
+// Закрытие модального окна оплаты
 function closePaymentModal() {
-    const modal = document.getElementById('payment-modal');
-    modal.style.display = 'none';
-    currentOrder = null;
+    paymentModal.style.display = 'none';
 }
 
-// Подтверждение платежа
-async function confirmPayment() {
-    if (!currentOrder) return;
-
+// Обработка оплаты
+async function handlePayment() {
     try {
-        const response = await fetch('https://your-bot-domain.com/buy_stars', {
+        // Отправка данных на сервер
+        const response = await fetch('/api/payment', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                user_id: tg.initDataUnsafe.user.id,
-                amount: currentOrder.amount,
-                price_per_star: currentOrder.price_per_star,
-                total_price: currentOrder.total_price,
-                commission: currentOrder.commission,
-                final_price: currentOrder.final_price
+                amount: parseInt(starsAmount.textContent),
+                price: parseFloat(paymentAmount.textContent),
+                user_id: tg.initDataUnsafe.user.id
             })
         });
-
-        const data = await response.json();
-        if (data.success) {
-            closePaymentModal();
-            loadUserStats(); // Обновляем статистику
-            showSuccessMessage('Stars have been sent to your account!');
-        } else {
-            showErrorMessage('Failed to process payment. Please try again.');
+        
+        if (!response.ok) {
+            throw new Error('Ошибка при создании платежа');
         }
+        
+        const data = await response.json();
+        
+        // Отправка данных в Telegram
+        tg.sendData(JSON.stringify({
+            type: 'payment',
+            payment_id: data.payment_id,
+            amount: data.amount,
+            price: data.price
+        }));
+        
+        // Закрытие модального окна
+        closePaymentModal();
+        
     } catch (error) {
-        console.error('Error confirming payment:', error);
-        showErrorMessage('An error occurred. Please try again.');
+        console.error('Ошибка при обработке платежа:', error);
+        alert('Произошла ошибка при обработке платежа. Пожалуйста, попробуйте позже.');
     }
 }
 
-// Показ сообщения об успехе
-function showSuccessMessage(message) {
-    tg.showAlert(message);
-}
-
-// Показ сообщения об ошибке
-function showErrorMessage(message) {
-    tg.showAlert(message);
-} 
+// Обработка ошибок
+window.onerror = function(message, source, lineno, colno, error) {
+    console.error('Ошибка:', {message, source, lineno, colno, error});
+    alert('Произошла ошибка. Пожалуйста, попробуйте позже.');
+    return false;
+}; 

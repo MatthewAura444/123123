@@ -10,7 +10,7 @@ TON_API_KEY = "b7319d6ff2f6298621d768e82a2d0d24fa00de0891af11ce0ee0459ba96c54be"
 DATABASE_URL = "sqlite:///stars_shop.db"
 
 # Настройки веб-приложения
-WEBAPP_URL = ""  # URL вашего размещенного веб-приложения
+WEBAPP_URL = "https://matthewaura444.github.io/123123/"  # URL вашего размещенного веб-приложения
 
 # Настройки комиссии
 COMMISSION_RATE = 0.02  # 2% комиссия

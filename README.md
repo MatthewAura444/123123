@@ -1,135 +1,59 @@
-# Telegram Gifts Marketplace
+# Telegram Stars Shop Bot
 
-Платформа для продажи и покупки подарков через Telegram с поддержкой TON.
+Бот для продажи Telegram Stars через TON. Автоматизированная система покупки и продажи Stars с комиссией 2%.
 
-## Возможности
+## Функциональность
 
-- Создание и управление коллекциями подарков
-- Загрузка и продажа цифровых и физических подарков
-- Поддержка 3D моделей
-- Интеграция с TON для платежей
-- Система рейтингов и отзывов
-- WebSocket уведомления в реальном времени
-- Адаптивный дизайн
-- Поддержка темной темы
-
-## Технологии
-
-- Node.js
-- Express
-- MongoDB
-- WebSocket
-- TON Connect
-- React
-- Tailwind CSS
+- Покупка Telegram Stars через TON
+- Автоматический расчет комиссии (2%)
+- Автоматическая отправка Stars после подтверждения платежа
+- История заказов
+- Статистика пользователя
+- Безопасные транзакции
 
 ## Установка
 
 1. Клонируйте репозиторий:
 ```bash
-git clone https://github.com/your-username/telegram-gifts.git
-cd telegram-gifts
+git clone https://github.com/your-username/telegram-stars-shop.git
+cd telegram-stars-shop
 ```
 
 2. Установите зависимости:
 ```bash
-npm install
+pip install python-telegram-bot
 ```
 
-3. Создайте файл .env:
-```env
-BOT_TOKEN=your_telegram_bot_token
-MONGODB_URI=mongodb://localhost:27017/telegram-gifts
-PORT=3000
-WS_PORT=8080
-JWT_SECRET=your_jwt_secret
+3. Создайте файл `.env` и добавьте в него токен бота:
+```
+TELEGRAM_BOT_TOKEN=your_bot_token
 ```
 
-4. Запустите сервер:
+4. Запустите бота:
 ```bash
-npm run dev
+python bot.py
 ```
 
-## API Endpoints
+## Использование
 
-### Аутентификация
-- POST /api/auth/register - Регистрация
-- POST /api/auth/login - Вход
-- GET /api/auth/profile - Получение профиля
-- PUT /api/auth/profile - Обновление профиля
-- PUT /api/auth/avatar - Обновление аватара
+1. Запустите бота командой `/start`
+2. Нажмите кнопку "Buy Stars" для открытия магазина
+3. Выберите количество Stars для покупки
+4. Отправьте точную сумму TON на указанный кошелек
+5. Подтвердите платеж
+6. Stars будут автоматически отправлены на ваш аккаунт
 
-### Коллекции
-- POST /api/collections - Создание коллекции
-- GET /api/collections - Получение списка коллекций
-- GET /api/collections/:id - Получение коллекции
-- PUT /api/collections/:id - Обновление коллекции
-- DELETE /api/collections/:id - Удаление коллекции
+## Команды
 
-### Подарки
-- POST /api/gifts - Создание подарка
-- GET /api/gifts - Получение списка подарков
-- GET /api/gifts/:id - Получение подарка
-- PUT /api/gifts/:id - Обновление подарка
-- DELETE /api/gifts/:id - Удаление подарка
+- `/start` - Начать работу с ботом
+- `/my_orders` - Просмотр истории заказов
+- `/my_profile` - Просмотр профиля и статистики
 
-### Транзакции
-- POST /api/transactions - Создание транзакции
-- GET /api/transactions - Получение списка транзакций
-- GET /api/transactions/:id - Получение транзакции
-- PUT /api/transactions/:id/status - Обновление статуса транзакции
-- GET /api/transactions/stats - Получение статистики транзакций
+## Безопасность
 
-## WebSocket Events
-
-### События подарков
-- NEW_GIFT - Новый подарок
-- GIFT_UPDATED - Подарок обновлен
-- GIFT_DELETED - Подарок удален
-
-### События коллекций
-- NEW_COLLECTION - Новая коллекция
-- COLLECTION_UPDATED - Коллекция обновлена
-- COLLECTION_DELETED - Коллекция удалена
-
-### События транзакций
-- NEW_TRANSACTION - Новая транзакция
-- TRANSACTION_UPDATED - Транзакция обновлена
-
-### События отзывов
-- NEW_REVIEW - Новый отзыв
-
-### События пользователей
-- USER_STATUS - Статус пользователя
-
-## Разработка
-
-### Структура проекта
-```
-telegram-gifts/
-├── public/
-│   ├── css/
-│   ├── js/
-│   └── images/
-├── src/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── middleware/
-│   └── websocket/
-├── uploads/
-│   ├── images/
-│   └── models/
-├── .env
-├── .gitignore
-├── package.json
-└── README.md
-```
-
-### Скрипты
-- `npm start` - Запуск сервера
-- `npm run dev` - Запуск сервера в режиме разработки
-- `npm test` - Запуск тестов
+- Все транзакции защищены
+- Комиссия автоматически отправляется на указанный TON кошелек
+- Проверка статуса заказа перед отправкой Stars
 
 ## Лицензия
 

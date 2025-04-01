@@ -43,7 +43,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "inline_keyboard": [[
                 {
                     "text": "Buy Stars ⭐️",
-                    "web_app": {"url": "https://matthewaura444.github.io/123123/public/telegram-app.html"}
+                    "web_app": {"url": "https://matthewaura444.github.io/123123/public/index.html"}
                 }
             ]]
         }

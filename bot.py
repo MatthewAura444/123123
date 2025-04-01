@@ -12,7 +12,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Get bot token from environment variable
-TOKEN = "8019781527:AAFM9My4_fxzX4e94Us8H2DgQmcNa5m2dSs"
+TOKEN = "7687296256:AAEnJhFMiWWKAZ0aXQaqQF3pzynVS9Do4OU"  # Используем токен из config.py
 
 # Комиссия и TON кошелек
 COMMISSION_RATE = 0.02  # 2% комиссия
@@ -43,7 +43,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "inline_keyboard": [[
                 {
                     "text": "Buy Stars ⭐️",
-                    "web_app": {"url": "https://matthewaura444.github.io/123123/public/index.html"}
+                    "web_app": {"url": "https://auratgstars-bot.github.io/"}
                 }
             ]]
         }

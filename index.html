@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stars Market</title>
+    <link rel="stylesheet" href="telegram-app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body class="telegram-app">
+    <div class="container">
+        <!-- Заголовок -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Stars Market <i class="fas fa-star"></i></h1>
+                <p>Покупайте Stars по лучшей цене</p>
+            </div>
+        </header>
+
+        <!-- Секция баланса -->
+        <section class="balance-section">
+            <div class="balance-card">
+                <div class="balance-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="balance-info">
+                    <span class="balance-label">Ваш баланс</span>
+                    <span class="balance-amount" id="userBalance">0 Stars</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция пакетов Stars -->
+        <section class="stars-packages">
+            <h2>Выберите пакет Stars</h2>
+            <div class="stars-grid">
+                <!-- Stars карточки будут добавлены через JavaScript -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Модальное окно оплаты -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Оплата Stars</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="payment-summary">
+                    <div class="summary-item">
+                        <i class="fas fa-star"></i>
+                        <div class="summary-details">
+                            <span class="summary-label">Количество Stars</span>
+                            <span class="summary-value" id="starsAmount">0</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-coins"></i>
+                        <div class="summary-details">
+                            <span class="summary-label">Сумма к оплате</span>
+                            <span class="summary-value" id="paymentAmount">0 TON</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="recipient-form">
+                    <div class="form-group">
+                        <label for="recipientInput">Username или ID получателя</label>
+                        <input type="text" id="recipientInput" placeholder="Введите @username или ID">
+                    </div>
+                </div>
+                <button class="payment-button" id="payButton">
+                    <i class="fas fa-shopping-cart"></i>
+                    Оплатить
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="telegram-app.js"></script>
+</body>
+</html> 

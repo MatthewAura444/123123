@@ -1,7 +1,6 @@
 // Инициализация Telegram WebApp
 let tg = window.Telegram.WebApp;
-let user = null;
-let config = null;
+let currentOrder = null;
 
 // Инициализация приложения
 async function initApp() {
@@ -14,12 +13,9 @@ async function initApp() {
         });
         const data = await response.json();
         
-        user = data.user;
-        config = data.config;
-        
         // Настраиваем главную кнопку
-        tg.MainButton.setText(config.mainButtonText);
-        tg.MainButton.setColor(config.mainButtonColor);
+        tg.MainButton.setText(data.config.mainButtonText);
+        tg.MainButton.setColor(data.config.mainButtonColor);
         
         // Загружаем начальные данные
         await loadInitialData();
@@ -206,7 +202,11 @@ function showError(message) {
 }
 
 // Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', initApp);
+document.addEventListener('DOMContentLoaded', function() {
+    tg.expand();
+    loadUserStats();
+    initializeStarsGrid();
+});
 
 // Обработчики событий Telegram
 tg.MainButton.onClick(() => {
@@ -317,4 +317,137 @@ document.querySelectorAll('.modal-content').forEach(content => {
     content.addEventListener('click', (event) => {
         event.stopPropagation();
     });
-}); 
+});
+
+// Загрузка статистики пользователя
+async function loadUserStats() {
+    try {
+        const response = await fetch('https://your-bot-domain.com/get_stats', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: tg.initDataUnsafe.user.id
+            })
+        });
+        
+        const data = await response.json();
+        if (data.action === 'stats_update') {
+            document.getElementById('total-stars').textContent = data.stars_bought;
+            document.getElementById('total-spent').textContent = data.total_spent;
+        }
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+// Инициализация сетки Stars
+function initializeStarsGrid() {
+    const starsGrid = document.getElementById('stars-grid');
+    const starOptions = [
+        { amount: 100, price: 0.5 },
+        { amount: 500, price: 2.0 },
+        { amount: 1000, price: 3.5 },
+        { amount: 2000, price: 6.0 },
+        { amount: 5000, price: 14.0 }
+    ];
+
+    starOptions.forEach(option => {
+        const starCard = createStarCard(option);
+        starsGrid.appendChild(starCard);
+    });
+}
+
+// Создание карточки Stars
+function createStarCard(option) {
+    const card = document.createElement('div');
+    card.className = 'star-card';
+    card.onclick = () => showPaymentModal(option);
+
+    card.innerHTML = `
+        <div class="star-icon"></div>
+        <div class="star-info">
+            <div class="star-amount">${option.amount} Stars</div>
+            <div class="star-price">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                ${option.price} TON
+            </div>
+            <button class="buy-button">Buy Now</button>
+        </div>
+    `;
+
+    return card;
+}
+
+// Показ модального окна оплаты
+function showPaymentModal(option) {
+    const modal = document.getElementById('payment-modal');
+    const amountElement = document.getElementById('payment-amount');
+    const commission = option.price * 0.02; // 2% комиссия
+    const totalAmount = option.price + commission;
+
+    currentOrder = {
+        amount: option.amount,
+        price_per_star: option.price,
+        total_price: option.price,
+        commission: commission,
+        final_price: totalAmount
+    };
+
+    amountElement.textContent = totalAmount.toFixed(2);
+    modal.style.display = 'flex';
+}
+
+// Закрытие модального окна
+function closePaymentModal() {
+    const modal = document.getElementById('payment-modal');
+    modal.style.display = 'none';
+    currentOrder = null;
+}
+
+// Подтверждение платежа
+async function confirmPayment() {
+    if (!currentOrder) return;
+
+    try {
+        const response = await fetch('https://your-bot-domain.com/buy_stars', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: tg.initDataUnsafe.user.id,
+                amount: currentOrder.amount,
+                price_per_star: currentOrder.price_per_star,
+                total_price: currentOrder.total_price,
+                commission: currentOrder.commission,
+                final_price: currentOrder.final_price
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            closePaymentModal();
+            loadUserStats(); // Обновляем статистику
+            showSuccessMessage('Stars have been sent to your account!');
+        } else {
+            showErrorMessage('Failed to process payment. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error confirming payment:', error);
+        showErrorMessage('An error occurred. Please try again.');
+    }
+}
+
+// Показ сообщения об успехе
+function showSuccessMessage(message) {
+    tg.showAlert(message);
+}
+
+// Показ сообщения об ошибке
+function showErrorMessage(message) {
+    tg.showAlert(message);
+} 

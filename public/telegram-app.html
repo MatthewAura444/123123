@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>TelegramGift</title>
+    <title>Telegram Stars Shop</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="collections.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -173,70 +173,63 @@
             font-weight: 500;
         }
 
-        .gifts-grid {
+        .stars-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
             gap: 24px;
         }
 
-        .gift-card {
+        .star-card {
             background: var(--glass-effect);
             border-radius: 24px;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--card-shadow);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
         }
 
-        .gift-card:hover {
+        .star-card:hover {
             transform: translateY(-12px) scale(1.02);
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
         }
 
-        .gift-image {
+        .star-icon {
             width: 100%;
             padding-top: 100%;
             position: relative;
             overflow: hidden;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .gift-image img {
+        .star-icon::before {
+            content: '⭐️';
+            font-size: 48px;
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        .gift-card:hover .gift-image img {
-            transform: scale(1.15);
-        }
-
-        .gift-info {
+        .star-info {
             padding: 20px;
             background: var(--blur-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
         }
 
-        .gift-name {
-            font-size: 18px;
+        .star-amount {
+            font-size: 24px;
             font-weight: 700;
             color: var(--tg-theme-text-color);
             margin-bottom: 8px;
             letter-spacing: -0.3px;
         }
 
-        .gift-model {
-            font-size: 15px;
-            color: var(--tg-theme-hint-color);
-            margin-bottom: 16px;
-            font-weight: 500;
-        }
-
-        .gift-price {
+        .star-price {
             font-size: 20px;
             font-weight: 800;
             background: var(--gradient-primary);
@@ -248,10 +241,105 @@
             letter-spacing: -0.5px;
         }
 
-        .gift-price::before {
-            content: '₽';
+        .buy-button {
+            background: var(--gradient-primary);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .buy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(42, 171, 238, 0.4);
+        }
+
+        .buy-button:active {
+            transform: translateY(0);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--glass-effect);
+            border-radius: 24px;
+            padding: 32px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--card-shadow);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .modal-text {
             font-size: 16px;
-            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-button.primary {
+            background: var(--gradient-primary);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+        }
+
+        .modal-button.secondary {
+            background: transparent;
+            color: var(--tg-theme-text-color);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .modal-button:active {
+            transform: translateY(0);
         }
 
         @media (max-width: 768px) {
@@ -272,7 +360,7 @@
                 font-size: 28px;
             }
 
-            .gifts-grid {
+            .stars-grid {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
                 gap: 16px;
             }
@@ -367,101 +455,12 @@
             transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(3, 126, 229, 0.4);
         }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--gradient-secondary);
-            border-radius: 24px 24px 0 0;
-            padding: 24px;
-            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header h2 {
-            font-size: 24px;
-            font-weight: 700;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--tg-theme-hint-color);
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        .price-input-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .price-input-container input,
-        .price-input-container textarea {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 16px;
-            background: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
-            font-size: 17px;
-            font-weight: 500;
-        }
-
-        .price-input-container textarea {
-            height: 100px;
-            resize: none;
-        }
-
-        .confirm-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--gradient-primary);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            border-radius: 16px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(3, 126, 229, 0.3);
-        }
-
-        .confirm-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(3, 126, 229, 0.4);
-        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header">
-            <h1>TelegramGift</h1>
+            <h1>Stars Shop</h1>
         </div>
 
         <div class="nav-tabs">
@@ -473,32 +472,17 @@
         <div id="nft" class="tab-content active">
             <div class="market-stats">
                 <div class="stat-card">
-                    <div class="stat-value">2,456</div>
-                    <div class="stat-label">Active Sellers</div>
+                    <div class="stat-value" id="total-stars">0</div>
+                    <div class="stat-label">Total Stars Bought</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">12,089</div>
-                    <div class="stat-label">Available Gifts</div>
+                    <div class="stat-value" id="total-spent">0</div>
+                    <div class="stat-label">Total Spent (TON)</div>
                 </div>
             </div>
 
-            <div id="giftsContainer" class="gifts-grid">
-                <!-- Тестовый подарок -->
-                <div class="gift-card">
-                    <div class="gift-image">
-                        <img src="https://via.placeholder.com/300" alt="Christmas Gift">
-                    </div>
-                    <div class="gift-info">
-                        <div class="gift-name">Christmas Gift</div>
-                        <div class="gift-model">Holiday Collection</div>
-                        <div class="gift-price">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                            </svg>
-                            100 TON
-                        </div>
-                    </div>
-                </div>
+            <div class="stars-grid" id="stars-grid">
+                <!-- Star cards will be added here dynamically -->
             </div>
         </div>
 
@@ -544,18 +528,17 @@
         </div>
     </div>
 
-    <!-- Модальное окно для установки цены -->
-    <div id="setPriceModal" class="modal">
+    <div class="modal" id="payment-modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Set Price</h2>
-                <button class="close-btn" onclick="hideSetPriceModal()">×</button>
+            <h2 class="modal-title">Payment Details</h2>
+            <div class="modal-text">
+                <p>Please send exactly <span id="payment-amount">0</span> TON to this wallet:</p>
+                <p><code id="payment-wallet">UQASbk4JxjCjgU6Hj3mdW9iPiF-csOsPBLhLhEYoAQdt8vwY</code></p>
+                <p>After sending, click "Confirm Payment" below.</p>
             </div>
-            <div id="selectedGiftPreview" class="gift-preview"></div>
-            <div class="price-input-container">
-                <input type="number" id="setPriceInput" placeholder="Enter price in TON" step="0.1" min="0">
-                <textarea id="setPriceDescription" placeholder="Add description (optional)"></textarea>
-                <button class="confirm-btn" onclick="listGiftForSale()">List for Sale</button>
+            <div class="modal-buttons">
+                <button class="modal-button secondary" onclick="closePaymentModal()">Cancel</button>
+                <button class="modal-button primary" onclick="confirmPayment()">Confirm Payment</button>
             </div>
         </div>
     </div>

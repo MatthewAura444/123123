@@ -3,57 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stars Shop - Магазин Stars в Telegram</title>
+    <title>Stars Market - Покупка Stars в Telegram</title>
     <link rel="stylesheet" href="telegram-app.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://ton.org/tonkeeper.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="telegram-app">
     <div class="container">
-        <header>
-            <h1>Stars Shop</h1>
-            <p>Купите Stars для отправки в Telegram</p>
+        <header class="app-header">
+            <div class="header-content">
+                <h1><i class="fas fa-star"></i> Stars Market</h1>
+                <p>Покупайте Stars для общения в Telegram</p>
+            </div>
         </header>
 
-        <main>
-            <div class="stars-grid">
-                <!-- Stars будут добавлены через JavaScript -->
+        <main class="app-main">
+            <div class="balance-section">
+                <div class="balance-card">
+                    <div class="balance-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="balance-info">
+                        <span class="balance-label">Ваш баланс</span>
+                        <span class="balance-amount" id="userBalance">0 Stars</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="loading-indicator">
-                <div class="spinner"></div>
-                <span>Загрузка Stars...</span>
-            </div>
+            <section class="stars-packages">
+                <h2>Выберите пакет Stars</h2>
+                <div class="stars-grid">
+                    <!-- Stars пакеты будут добавлены через JavaScript -->
+                </div>
+            </section>
         </main>
 
-        <footer>
-            <p>Powered by TON</p>
+        <footer class="app-footer">
+            <div class="footer-content">
+                <p>Powered by <img src="https://ton.org/download/ton_symbol.svg" alt="TON" class="ton-logo"> TON</p>
+            </div>
         </footer>
     </div>
 
     <!-- Модальное окно для оплаты -->
     <div class="modal" id="paymentModal">
         <div class="modal-content">
-            <button class="modal-close">&times;</button>
+            <div class="modal-header">
+                <h2>Покупка Stars</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
             <div class="modal-body">
-                <h2>Оплата Stars</h2>
-                <div class="payment-info">
-                    <div class="amount-info">
-                        <span>Количество Stars:</span>
-                        <span id="starsAmount">0</span>
+                <div class="payment-summary">
+                    <div class="summary-item">
+                        <i class="fas fa-star"></i>
+                        <div class="summary-details">
+                            <span class="summary-label">Количество Stars</span>
+                            <span class="summary-value" id="starsAmount">0</span>
+                        </div>
                     </div>
-                    <div class="price-info">
-                        <span>Стоимость:</span>
-                        <span id="paymentAmount">0 TON</span>
-                    </div>
-                    <div class="recipient-info">
-                        <label for="recipientInput">Получатель (username или ID):</label>
-                        <input type="text" id="recipientInput" placeholder="Введите username или ID получателя" required>
+                    <div class="summary-item">
+                        <i class="fas fa-coins"></i>
+                        <div class="summary-details">
+                            <span class="summary-label">Стоимость</span>
+                            <span class="summary-value" id="paymentAmount">0 TON</span>
+                        </div>
                     </div>
                 </div>
-                <div class="payment-actions">
-                    <button id="payButton" class="primary-button">Оплатить</button>
+
+                <div class="recipient-form">
+                    <div class="form-group">
+                        <label for="recipientInput">
+                            <i class="fas fa-user"></i> Получатель Stars
+                        </label>
+                        <input type="text" 
+                               id="recipientInput" 
+                               placeholder="Введите @username или ID"
+                               required>
+                    </div>
                 </div>
+
+                <button id="payButton" class="payment-button">
+                    <i class="fas fa-shopping-cart"></i>
+                    Оплатить
+                </button>
             </div>
         </div>
     </div>

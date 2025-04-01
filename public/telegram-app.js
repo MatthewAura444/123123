@@ -8,6 +8,7 @@ let payButton = document.getElementById('payButton');
 let starsAmount = document.getElementById('starsAmount');
 let paymentAmount = document.getElementById('paymentAmount');
 let recipientInput = document.getElementById('recipientInput');
+let userBalance = document.getElementById('userBalance');
 
 // Цены на Stars (с fragment.com)
 const STAR_PRICES = {
@@ -211,11 +212,23 @@ async function deleteGift(giftId) {
 
 // Вспомогательные функции
 function showSuccess(message) {
-    tg.showAlert(message);
+    tg.showPopup({
+        title: 'Успех',
+        message: message,
+        buttons: [{
+            type: 'ok'
+        }]
+    });
 }
 
 function showError(message) {
-    tg.showAlert(message);
+    tg.showPopup({
+        title: 'Ошибка',
+        message: message,
+        buttons: [{
+            type: 'ok'
+        }]
+    });
 }
 
 // Инициализация при загрузке страницы
@@ -224,12 +237,25 @@ document.addEventListener('DOMContentLoaded', () => {
     tg.expand();
     tg.ready();
     
+    // Установка темы
+    setTheme();
+    
     // Загрузка Stars
     loadStars();
+    
+    // Загрузка баланса пользователя
+    loadUserBalance();
     
     // Обработчики событий
     modalClose.addEventListener('click', closePaymentModal);
     payButton.addEventListener('click', handlePayment);
+    
+    // Закрытие модального окна при клике вне его
+    window.addEventListener('click', (e) => {
+        if (e.target === paymentModal) {
+            closePaymentModal();
+        }
+    });
 });
 
 // Обработчики событий Telegram
@@ -366,6 +392,13 @@ async function loadUserStats() {
     }
 }
 
+// Установка темы в соответствии с Telegram
+function setTheme() {
+    document.body.style.setProperty('--background-color', tg.backgroundColor);
+    document.body.style.setProperty('--text-primary', tg.textColor);
+    document.body.style.setProperty('--primary-color', '#0088cc');
+}
+
 // Загрузка Stars
 function loadStars() {
     // Очистка сетки
@@ -383,9 +416,15 @@ function createStarCard(amount, price) {
     const card = document.createElement('div');
     card.className = 'star-card';
     card.innerHTML = `
+        <div class="star-icon">
+            <i class="fas fa-star"></i>
+        </div>
         <h3>${amount} Stars</h3>
         <div class="price">${price} TON</div>
-        <button class="primary-button">Купить</button>
+        <button class="primary-button">
+            <i class="fas fa-shopping-cart"></i>
+            Купить
+        </button>
     `;
     
     // Обработчик клика
@@ -396,16 +435,45 @@ function createStarCard(amount, price) {
     return card;
 }
 
+// Загрузка баланса пользователя
+async function loadUserBalance() {
+    try {
+        const response = await fetch('/api/user/balance', {
+            headers: {
+                'X-Telegram-Init-Data': tg.initData
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Ошибка загрузки баланса');
+        }
+        
+        const data = await response.json();
+        userBalance.textContent = `${data.balance} Stars`;
+    } catch (error) {
+        console.error('Ошибка при загрузке баланса:', error);
+        userBalance.textContent = '0 Stars';
+    }
+}
+
 // Открытие модального окна оплаты
 function openPaymentModal(amount, price) {
     starsAmount.textContent = amount;
     paymentAmount.textContent = `${price} TON`;
     paymentModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    
+    // Фокус на поле ввода получателя
+    recipientInput.focus();
 }
 
 // Закрытие модального окна оплаты
 function closePaymentModal() {
     paymentModal.style.display = 'none';
+    document.body.style.overflow = '';
+    
+    // Очистка поля получателя
+    recipientInput.value = '';
 }
 
 // Обработка оплаты
@@ -413,20 +481,24 @@ async function handlePayment() {
     try {
         const recipient = recipientInput.value.trim();
         if (!recipient) {
-            alert('Пожалуйста, укажите получателя Stars');
+            showError('Пожалуйста, укажите получателя Stars');
             return;
         }
+
+        // Показываем индикатор загрузки
+        payButton.disabled = true;
+        payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
 
         // Отправка данных на сервер
         const response = await fetch('/api/payment', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-Telegram-Init-Data': tg.initData
             },
             body: JSON.stringify({
                 amount: parseInt(starsAmount.textContent),
                 price: parseFloat(paymentAmount.textContent),
-                user_id: tg.initDataUnsafe.user.id,
                 recipient: recipient
             })
         });
@@ -449,18 +521,25 @@ async function handlePayment() {
         // Закрытие модального окна
         closePaymentModal();
         
-        // Очистка поля получателя
-        recipientInput.value = '';
+        // Показываем сообщение об успехе
+        showSuccess('Платёж успешно создан');
+        
+        // Обновляем баланс
+        loadUserBalance();
         
     } catch (error) {
         console.error('Ошибка при обработке платежа:', error);
-        alert('Произошла ошибка при обработке платежа. Пожалуйста, попробуйте позже.');
+        showError('Произошла ошибка при обработке платежа');
+    } finally {
+        // Возвращаем кнопку в исходное состояние
+        payButton.disabled = false;
+        payButton.innerHTML = '<i class="fas fa-shopping-cart"></i> Оплатить';
     }
 }
 
 // Обработка ошибок
 window.onerror = function(message, source, lineno, colno, error) {
     console.error('Ошибка:', {message, source, lineno, colno, error});
-    alert('Произошла ошибка. Пожалуйста, попробуйте позже.');
+    showError('Произошла ошибка. Пожалуйста, попробуйте позже.');
     return false;
 }; 
